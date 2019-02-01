@@ -1,41 +1,53 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection as lc
-
-
 import time as t
 
-
-
-#start=time.time()
+R = 1
+start=t.time()
 
 # Read in coordinates from file and convert it into a list
 def read_coordinate_file(filename):
-    file1 = open(filename, 'r')
+    file = open(filename, 'r')
     npArray = []
-    for line in file1:
+    for line in file:
         line = line.strip('{\n}')
         line = line.replace(' ', '')
         line = line.split(',')
         for item in line:
             npArray.append(float(item))
+
     npArray = np.array(npArray)
-    np.set_printoptions(threshold=np.nan)      # Prints out all items in a numpy list
-    return npArray.reshape(-1, 2)
-    file1.close()
+    #np.set_printoptions(threshold=np.nan)      # Prints out all items in a numpy list
+    npArray2 = npArray.reshape(-1, 2)
 
-coord_list = read_coordinate_file('HungaryCities.txt')
-#print(coord_list)
+    lat = npArray2[:, 0]
+    long = npArray2[:, 1]
+
+    x = (R * (np.pi * long) / 180)
+    y = (R * np.log(np.tan((np.pi / 4) + ((np.pi * lat) / 360))))
+
+    x = x.reshape(-1, 1)  # ful lösning, hitta bättre metod
+    y = y.reshape(-1, 1)
+    xy = np.hstack((x, y))
+
+    return xy
+    file.close()
 
 
+end=t.time()
+print("Tidsåtgång: ", end-start)
 
-def plot_points(coord_list):
-    for cities in coord_list:
+def plot_points(xy):
+    for cities in xy:
         plt.scatter(cities[0], cities[1], color='r')
-        #print(cities[0])
     plt.show()
 
+coord_list = read_coordinate_file('HungaryCities.txt')
+plot_points(coord_list)
 
+
+'''
 def plot_points2(coord_list):
     lines = []
     for cities in coord_list:
@@ -54,9 +66,6 @@ def plot_points2(coord_list):
     plt.show()
 
 
-plot_points(coord_list)
+
 plot_points2(coord_list)
-
-#end=time.time()
-
-#print(end-time)
+'''
