@@ -25,7 +25,6 @@ def read_coordinate_file(filename):
 
     x = (R * (np.pi * long) / 180)
     y = (R * np.log(np.tan((np.pi / 4) + ((np.pi * lat) / 360))))
-
     x = x.reshape(-1, 1)  # ful lösning, hitta bättre metod
     y = y.reshape(-1, 1)
     xy = np.hstack((x, y))
@@ -47,28 +46,35 @@ def plot_points(xy):
 def construct_graph_connections(coord_list, radius):
     print(coord_list)
     costArray = np.array([])
-    for i in coord_list:
-        for j in coord_list:
+    indicies = np.array([])
+    for city1, i in enumerate(coord_list):
+        for city2, j in enumerate(coord_list):
             if (i != j).all():
-                distance = np.sqrt((i[0] - j[0])**2 + (i[1] - j[1])**2)
-                print("distance: ", distance)
+                distance = np.sqrt((j[0] - i[0])**2 + (j[1] - i[1])**2) # x2-x1, y2-y1
+                print("x1:", i[0], "y1:", i[1],"x2:", j[0],"y2:", j[1],)
+                print("distance:", distance)
                 if distance <= radius:
                     cost = distance ** (9 / 10)
                     costArray = np.append(costArray, cost)
-                    print("cost: ", cost)
-                    print("cost array: ", costArray)
+                    print("City:", city1, "and city:", city2)
+                    print("TRUE\n")
+                    indicies = np.append(indicies, city1)
+                    indicies = np.append(indicies, city2)
+                else:
+                    print("City:", city1, "and city:", city2)
+                    print("FALSE\n")
+                indicies = indicies.reshape(-1, 2)
+                costArray = costArray.reshape(-1, 1)
+    #print("City x       City y      Cost\n", np.concatenate((indicies, costArray), axis=1)) # Only for visual
+    print(indicies, costArray)
 
-    #distance = np.sqrt((coord_list[0][0] - coord_list[1][0])**2 + (coord_list[0][1] - coord_list[1][1])**2)
-    #for i in range(0, (len(coord_list)-1)):
-    #    distance = np.sqrt((coord_list[i][0] - coord_list[i+1][0]) ** 2 + (coord_list[i][1] - coord_list[i+1][1]) ** 2)
-    #    print(distance)
-    #    print(i)
-    #cost = distance ** (9 / 10)
-    #print(cost)
+
+
+
 
 
 #plot_points(coord_list)
-construct_graph_connections(coord_list, 5)
+construct_graph_connections(coord_list, 0.08)
 
 '''
 def plot_points2(coord_list):
@@ -76,15 +82,15 @@ def plot_points2(coord_list):
     for cities in coord_list:
         #plt.scatter(cities[0], cities[1], color='r')
         #print(cities)
-        lines.append( (cities[0], cities[1]) )
-    #plt.show()
+        lines.append((cities[0], cities[1]))
     line_segments = lc([lines],linestyles='dotted')
     fig = plt.figure()
     ax = fig.gca()
     ax.add_collection(line_segments)
-    ax.set_ylim((15,23))
-    ax.set_xlim((45, 49))
+    ax.set_ylim((-0.1,0.2))
+    ax.set_xlim((-0.1, 0.1))
     print(line_segments)
     plt.show()
+
 plot_points2(coord_list)
 '''
