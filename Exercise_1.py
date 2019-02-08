@@ -6,11 +6,8 @@ from scipy.sparse import csr_matrix as csr
 from scipy.sparse import csgraph
 from scipy.spatial import cKDTree as ckd
 
-R = 1
-START_NODE = 0
-END_NODE = 5
-SEARCH_RADIUS = 0.08
 
+R = 1
 
 # Se över om våra funktioners argument ska ha samma namn som de globala variablerna
 def mercator_projection(longitude, latitude):
@@ -63,12 +60,20 @@ def construct_graph_connections(coords, radius):
 
 
 def construct_fast_graph_connections(coords, radius):
-    p = [[1,2],[3,4],[5,6],[7,8]]
-    tree = ckd(p)
-    distance, index = tree.query((3, 4), k=3)
-    print("idx\n", index)
-    print("p[idx]\n", p[index])
-    print("distance\n", distance)
+    tree = ckd(coord_list)
+    filtered_cities = tree.query_ball_point(coords, radius)
+    indices = []
+    distances = []
+    for value, cities in enumerate(filtered_cities):
+        for city in cities:
+            if value != city:
+                if [city, value] in indices:
+                    pass
+                else:
+                    indices.append([value, city])
+                    distances.append(np.linalg.norm(coord_list[value] - coord_list[city]))
+    costs = np.array(distances) ** (9 / 10)
+    return np.array(indices), costs
 
 
 # Creates a sparse graph which is later used for dijkstra
@@ -99,33 +104,32 @@ def path_to_array(path):
     path_indices = []
     for i in range(len(path) - 1):
         path_indices.append([path[i], path[i + 1]])
-        print(path_indices)
     return path_indices
 
 
+start_node = 1573
+end_node = 10584
+search_radius = 0.0025
+
 start_time = t.time()
 time = t.time()
-coord_list = read_coordinate_file('SampleCoordinates.txt')
+coord_list = read_coordinate_file('GermanyCities.txt')
 print('| Time read coordinate file: {:4.4f}s'.format(t.time() - time))
 
 time = t.time()
-city_indices, travel_costs = construct_graph_connections(coord_list, SEARCH_RADIUS)
-#indices2, costs2 = construct_fast_graph_connections(coord_list, SEARCH_RADIUS)
+city_indices, travel_costs = construct_graph_connections(coord_list, search_radius)
+#city_indices, travel_costs = construct_fast_graph_connections(coord_list, search_radius)
 print('| Time construct graph connections: {:4.4f}s'.format(t.time() - time))
 
-print("indicies", city_indices)
-# print("costs", costs)
-# print("indicies2", indices2)
-# print("costs2", costs2)
 
 time = t.time()
 sparse_graph = construct_graph(city_indices, travel_costs, len(coord_list))
-path_cost, predecessor_matrix = cheapest_path(sparse_graph, START_NODE, END_NODE)
-chosen_path = compute_path(predecessor_matrix, START_NODE, END_NODE)
+path_cost, predecessor_matrix = cheapest_path(sparse_graph, start_node, end_node)
+chosen_path = compute_path(predecessor_matrix, start_node, end_node)
 chosen_path_indices = path_to_array(chosen_path)
 print('| Time calculate shortest path: {:4.4f}s'.format(t.time() - time))
 
 print('| The whole program took: {:4.4f}s'.format(t.time() - start_time))
-print(f'\nThe cheapest path between city {START_NODE} and city {END_NODE} costs: {path_cost}')
+print(f'\nThe cheapest path between city {start_node} and city {end_node} costs: {path_cost}')
 
 plot_points(coord_list, city_indices, chosen_path_indices)
