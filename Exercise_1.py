@@ -9,15 +9,10 @@ from scipy.spatial import cKDTree as ckd
 
 R = 1
 
-# Se över om våra funktioners argument ska ha samma namn som de globala variablerna
-def mercator_projection(longitude, latitude):
-    """
 
-    :param longitude:
-    :param latitude:
-    :return:
-    """
-    x = (R * (np.pi * float(longitude)) / 180)
+# Se över om våra funktioners argument ska ha samma namn som de globala variablerna
+def mercator_projection(longitud, latitude):
+    x = (R * (np.pi * float(longitud)) / 180)
     y = (R * np.log(np.tan((np.pi / 4) + ((np.pi * float(latitude)) / 360))))
     return x, y
 
@@ -28,15 +23,16 @@ def read_coordinate_file(filename):
     with open(filename, 'r') as file:
         for line in file:
             line = line.strip('{\n}')
-            latitude, longitude = line.split(',')
-            coord = mercator_projection(float(longitude), float(latitude))
+            latitude, longitud = line.split(',')
+            coord = mercator_projection(float(longitud), float(latitude))
             coords.append(coord)
-    return np.array(coords)
+    coord_list = np.array(coords)   # Kan man skippa detta steg och returna coords som en np array?
+    return coord_list
 
 
-def plot_points(coords, indices, path):
+def plot_points(coords, indices, chosenPath):   # !!! cord_list är detsamma som coords. Vilket namn ska vi köra på?!!!
     radius_segments = lc(coords[indices], color='gray', linewidths=0.2)
-    path_segment = lc(coords[np.array(path)], color='blue', linewidths=2)
+    path_segment = lc(coords[np.array(chosenPath)], color='blue', linewidths=2)
     plt.scatter(coords[:, 0], coords[:, 1], color='r', s=10)
 
     ax = plt.gca()
@@ -45,12 +41,12 @@ def plot_points(coords, indices, path):
     plt.show()
 
 
-def construct_graph_connections(coords, radius):
+def construct_graph_connections(coord_list, radius):
     indices = []
     distances = []
-    for i, city_i in enumerate(coords):
-        for j in range(i + 1, len(coords)):
-            city_j = coords[j]
+    for i, city_i in enumerate(coord_list):
+        for j in range(i + 1, len(coord_list)):
+            city_j = coord_list[j]
             distance = np.linalg.norm(city_i - city_j)
             if distance < radius:
                 distances.append(distance)
@@ -59,77 +55,89 @@ def construct_graph_connections(coords, radius):
     return np.array(indices), costs
 
 
-def construct_fast_graph_connections(coords, radius):
-    tree = ckd(coord_list)
-    filtered_cities = tree.query_ball_point(coords, radius)
-    indices = []
-    distances = []
-    for value, cities in enumerate(filtered_cities):
-        for city in cities:
-            if value != city:
-                if [city, value] in indices:
-                    pass
-                else:
-                    indices.append([value, city])
-                    distances.append(np.linalg.norm(coord_list[value] - coord_list[city]))
-    costs = np.array(distances) ** (9 / 10)
-    return np.array(indices), costs
-
-
 # Creates a sparse graph which is later used for dijkstra
 def construct_graph(indices, costs, N):
-    sparse_graph = (csr((costs, (indices[:, 0], indices[:, 1])), shape=(N, N)))
-    return sparse_graph
+    sparseGraph = (csr((costs, (indices[:, 0], indices[:, 1])), shape=(N, N)))
+    return sparseGraph
 
 
-def cheapest_path(sparse_graph, start_node, end_node):
-    cost_matrix, predecessors = csgraph.dijkstra(sparse_graph, directed=False, indices=start_node, return_predecessors=True)
-    return cost_matrix[end_node], predecessors
+def cheapest_path(sparseGraph, start_node, end_node):
+    cost_matrix, predecessor_matrix = csgraph.dijkstra(sparseGraph, directed=False, indices=start_node, return_predecessors=True)
+    return cost_matrix[end_node], predecessor_matrix
 
 
-def compute_path(predecessors, start, end):
+def compute_path(predecessor_matrix, start_node, end_node):
     path = []
-    current = end
-    while current != start:
-        path.append(current)
-        current = predecessors[current]
-    path.append(current)
+    while end_node != start_node:
+        path.append(end_node)
+        end_node = predecessor_matrix[end_node]
+    path.append(end_node)
     path.reverse()
     return path
 
 
-# Takes the indices from chosen path and groups them into pairs of city indices,
-# which lineCollection can use to print the cheapest path.
 def path_to_array(path):
-    path_indices = []
-    for i in range(len(path) - 1):
-        path_indices.append([path[i], path[i + 1]])
-    return path_indices
+    pathIndices = []
+    for i in range(len(path)-1):
+        pathIndices.append([path[i], path[i+1]])
+        #print(pathIndices)
+    return pathIndices
 
 
-start_node = 1573
-end_node = 10584
-search_radius = 0.0025
+def construct_fast_graph_connections(coords, radius):
+    p = coords
+    tree = ckd(p)
+    distance, index = tree.query((0, 0.07), k=3)
+    print("idx\n", index)
+    print("p[idx]\n", p[index])
+    print("distance\n", distance)
+    return indices, costs
+
+'''
+    indices = []
+    distances = []
+    for i, city_i in enumerate(coord_list):
+        for j in range(i + 1, len(coord_list)):
+            city_j = coord_list[j]
+            distance = np.linalg.norm(city_i - city_j)
+            if distance < radius:
+                distances.append(distance)
+                indices.append((i, j))
+    costs = np.array(distances) ** (9 / 10)
+    return np.array(indices), costs
+'''
+
+start_node = 0
+end_node = 5
+search_radius = 0.08
+
 
 start_time = t.time()
 time = t.time()
-coord_list = read_coordinate_file('GermanyCities.txt')
+coord_list = read_coordinate_file('SampleCoordinates.txt')
 print('| Time read coordinate file: {:4.4f}s'.format(t.time() - time))
 
 time = t.time()
-city_indices, travel_costs = construct_graph_connections(coord_list, search_radius)
-#city_indices, travel_costs = construct_fast_graph_connections(coord_list, search_radius)
+indices, costs = construct_graph_connections(coord_list, search_radius)
+indices2, costs2 = construct_fast_graph_connections(coord_list, search_radius)
 print('| Time construct graph connections: {:4.4f}s'.format(t.time() - time))
 
+#print("indicies", indices)
+#print("costs", costs)
+#print("indicies2", indices2)
+#print("costs2", costs2)
 
 time = t.time()
-sparse_graph = construct_graph(city_indices, travel_costs, len(coord_list))
-path_cost, predecessor_matrix = cheapest_path(sparse_graph, start_node, end_node)
-chosen_path = compute_path(predecessor_matrix, start_node, end_node)
-chosen_path_indices = path_to_array(chosen_path)
+sparseGraph = construct_graph(indices, costs, len(coord_list))
+cost, predecessor_matrix = cheapest_path(sparseGraph, start_node, end_node)
+chosenPath = compute_path(predecessor_matrix, start_node, end_node)
+chosenPathIndices = path_to_array(chosenPath)
 print('| Time calculate shortest path: {:4.4f}s'.format(t.time() - time))
 
 print('| The whole program took: {:4.4f}s'.format(t.time() - start_time))
-print(f'\nThe cheapest path between city {start_node} and city {end_node} costs: {path_cost}')
+print(f'\nThe cheapest path between city {start_node} and city {end_node} costs: {cost}')
 
-plot_points(coord_list, city_indices, chosen_path_indices)
+
+
+
+plot_points(coord_list, indices, chosenPathIndices)
