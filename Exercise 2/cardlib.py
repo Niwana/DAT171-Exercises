@@ -1,6 +1,9 @@
 import enum
 
 
+# ♣♦♠♥
+
+
 class Suit(enum.IntEnum):
     clubs = 0
     diamonds = 1
@@ -11,52 +14,105 @@ class Suit(enum.IntEnum):
         return self.name
 
 
-class NumberedCard:
+# Abstract class
+class PlayingCards:
+    """ This is an abstract class for playing cards """
+
     def __init__(self, value: int, suit: Suit):
-        """Description """
         self.value = value
         self.suit = suit
-        self.rank = value
 
     def __str__(self):
-        return "{} of {}".format(self.value, self.suit.name)
+        """ Returns a readable format of value and suit  """
+        return "{}, {}".format(self.value, self.suit)
+
+    def get_value(self):
+        """ Returns the value of the card """
+        raise NotImplementedError("Derived class did not override this method")
+
+    def get_suit(self):
+        """ Returns the suit of the card """
+        raise NotImplementedError("Derived class did not override this method")
 
 
-class JackCard:
-    def __init__(self, suit: [Suit]):
+class NumberedCard(PlayingCards):
+    def get_value(self):
+        return self.value
+
+    def get_suit(self):
+        return self.suit
+
+
+class JackCard(PlayingCards):
+    """ Creates the Jack card of a given suit"""
+
+    def __init__(self, suit: Suit):
+        """ Description """
+        self.suit = suit
+        self.value = 11
+
+    def get_value(self):
+        return self.value
+
+    def get_suit(self):
+        return self.suit
+
+
+class QueenCard(PlayingCards):
+    """ Creates the Queen card of a given suit"""
+
+    def __init__(self, suit: Suit):
+        """ Description """
+        self.suit = suit
+        self.value = 12
+
+    def get_value(self):
+        return self.value
+
+    def get_suit(self):
+        return self.suit
+
+
+class KingCard(PlayingCards):
+    """ Creates the King card of a given suit"""
+
+    def __init__(self, suit: Suit):
         """Description """
         self.suit = suit
-        self.rank = 11
+        self.value = 13
 
-    def __str__(self):
-        return "{} Jack".format(self.suit.name)
+    def get_value(self):
+        return self.value
+
+    def get_suit(self):
+        return self.suit
 
 
-class QueenCard:
-    def __init__(self, suit: [Suit]):
+class AceCard(PlayingCards):
+    """ Creates the Ace card of a given suit"""
+
+    def __init__(self, suit: Suit):
         """Description """
         self.suit = suit
-        self.rank = 12
+        self.value = 14
 
-    def __str__(self):
-        return "{} Queen".format(self.suit.name)
+    def get_value(self):
+        return self.value
 
-
-class KingCard:
-    def __init__(self, suit: [Suit]):
-        """Description """
-        self.suit = suit
-        self.rank = 13
-
-    def __str__(self):
-        return "{} King".format(self.suit.name)
+    def get_suit(self):
+        return self.suit
 
 
-class AceCard:
-    def __init__(self, suit: [Suit]):
-        """Description """
-        self.suit = suit
-        self.rank = 14
 
-    def __str__(self):
-        return "{} Ace".format(self.suit.name)
+class Hand:
+    def __init__(self):
+        self.cards = []
+
+    def add_card(self, card):
+        self.cards.append(card)
+
+    def remove_card(self):
+        pass
+
+    def sort_cards(self):
+        pass
