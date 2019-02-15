@@ -20,13 +20,8 @@ class Suit(enum.IntEnum):
 class PlayingCards(metaclass=abc.ABCMeta):
     """ This is an abstract class for playing cards """
 
-    def __init__(self):
-        self.value = None
-        self.suit = None
-
-    def __str__(self):
-        """ Returns a readable format of value and suit  """
-        return "{}, {}".format(self.value, self.suit)
+    def __init__(self, suit):
+        self.suit = suit
 
     @abc.abstractmethod
     def get_value(self):
@@ -41,9 +36,14 @@ class PlayingCards(metaclass=abc.ABCMeta):
 
 class NumberedCard(PlayingCards):
     """ Description """
+
     def __init__(self, value: int, suit: Suit):
+        super().__init__(suit)
         self.value = value
-        self.suit = suit
+
+    def __str__(self):
+        """ Returns a readable format of value and suit  """
+        return "{}, {}".format(self.value, self.suit)
 
     def get_value(self):
         return self.value
@@ -57,11 +57,14 @@ class JackCard(PlayingCards):
 
     def __init__(self, suit: Suit):
         """ Description """
-        self.suit = suit
-        self.value = 11
+        super().__init__(suit)
+
+    def __str__(self):
+        """ Returns a readable format of value and suit  """
+        return "{}, {}".format(self.get_value(), self.get_suit())
 
     def get_value(self):
-        return self.value
+        return 11
 
     def get_suit(self):
         return self.suit
@@ -72,11 +75,14 @@ class QueenCard(PlayingCards):
 
     def __init__(self, suit: Suit):
         """ Description """
-        self.suit = suit
-        self.value = 12
+        super().__init__(suit)
+
+    def __str__(self):
+        """ Returns a readable format of value and suit  """
+        return "{}, {}".format(self.get_value(), self.get_suit())
 
     def get_value(self):
-        return self.value
+        return 12
 
     def get_suit(self):
         return self.suit
@@ -87,11 +93,14 @@ class KingCard(PlayingCards):
 
     def __init__(self, suit: Suit):
         """Description """
-        self.suit = suit
-        self.value = 13
+        super().__init__(suit)
+
+    def __str__(self):
+        """ Returns a readable format of value and suit  """
+        return "{}, {}".format(self.get_value(), self.get_suit())
 
     def get_value(self):
-        return self.value
+        return 13
 
     def get_suit(self):
         return self.suit
@@ -102,11 +111,14 @@ class AceCard(PlayingCards):
 
     def __init__(self, suit: Suit):
         """Description """
-        self.suit = suit
-        self.value = 14
+        super().__init__(suit)
+
+    def __str__(self):
+        """ Returns a readable format of value and suit  """
+        return "{}, {}".format(self.get_value(), self.get_suit())
 
     def get_value(self):
-        return self.value
+        return 14
 
     def get_suit(self):
         return self.suit
@@ -133,65 +145,72 @@ class Hand:
         pass
 
     def best_poker_hand(self):  # best_poker_hand(self, cards=[]):
-        if PokerHand.two_pair(self) == True:
+        if PokerHand.two_pair(self):
             print("Two pairs:", PokerHand.cards)
-        elif PokerHand.one_pair(self) == True:
+        elif PokerHand.one_pair(self):
             print("One pair:", PokerHand.cards)
-        elif PokerHand.high_card(self) == True:
+        elif PokerHand.high_card(self):
             print("High cards:", PokerHand.cards)
-
-
-'''
-def best_hand(onHand):
-    if PokerHand.two_pair(onHand) == True:
-        print("Two pairs:", PokerHand.cards)
-    elif PokerHand.one_pair(onHand) == True:
-        print("One pair:", PokerHand.cards)
-    elif PokerHand.high_card(onHand) == True:
-        print("High cards:", PokerHand.cards)
-'''
 
 
 class StandardDeck:
     """ Text"""
 
     def __init__(self):
-        self.card = None
-        self.deck = []
+        self.cards = []
 
     def __str__(self):
         """ Returns a readable format of value and suit  """
         text = ""
-        for card in self.deck:
+        for card in self.cards:
             text += str(card) + "\n"
         return text
 
     def create_deck(self):
+        """ Take an empty list and creates a 52 card deck"""
         # Create the numbered cards
-        for i in range(2, 11):
+        for i in range(2, 11): # !!! Denna deck skapar 15 st NumberedCards, inga JackCards etc.
             card = NumberedCard(i, Suit.clubs)
-            deck.append((card.value, card.suit))
+            self.cards.append(card)
         for i in range(2, 11):
             card = NumberedCard(i, Suit.diamonds)
-            deck.append((card.value, card.suit))
+            self.cards.append(card)
         for i in range(2, 11):
             card = NumberedCard(i, Suit.spades)
-            deck.append((card.value, card.suit))
+            self.cards.append(card)
         for i in range(2, 11):
             card = NumberedCard(i, Suit.hearts)
-            deck.append((card.value, card.suit))
+            self.cards.append(card)
+        # Adds the other cards...
+        self.cards.append(JackCard(Suit.clubs))
+        self.cards.append(JackCard(Suit.diamonds))
+        self.cards.append(JackCard(Suit.spades))
+        self.cards.append(JackCard(Suit.hearts))
+        self.cards.append(QueenCard(Suit.clubs))
+        self.cards.append(QueenCard(Suit.diamonds))
+        self.cards.append(QueenCard(Suit.spades))
+        self.cards.append(QueenCard(Suit.hearts))
+        self.cards.append(KingCard(Suit.clubs))
+        self.cards.append(KingCard(Suit.diamonds))
+        self.cards.append(KingCard(Suit.spades))
+        self.cards.append(KingCard(Suit.hearts))
+        self.cards.append(AceCard(Suit.clubs))
+        self.cards.append(AceCard(Suit.diamonds))
+        self.cards.append(AceCard(Suit.spades))
+        self.cards.append(AceCard(Suit.hearts))
 
-        return deck
+        return self.cards
 
     def shuffle(self):
-        return random.shuffle(self.deck)
+        return random.shuffle(self)
 
 
-class PokerHand:
+class PokerHand(list):
     def __init__(self, cards):
+        super().__init__()
         self.cards = cards
 
-    def high_card(self):
+    def check_high_card(self):
         """ Takes a list of tuples and return the biggest tuple. Starts with the first element, than the second """
         highest_card = ()
         for i in range(len(self)):
@@ -202,15 +221,15 @@ class PokerHand:
         PokerHand.cards = highest_card  # Makes it possible to access the cards somewhere else
         return True
 
-    def one_pair(self):
+    def check_one_pair(self):
         """ Return true if cards_to_evaluate has a pair in it """
         pairs = []
         for i in range(len(self)):
             for j in range(len(self)):
                 # Check if the value of card i and card j is the same and whether or not they are not already in
                 # the list of pairs
-                if self[i][0] == self[j][0] and self[i][1] != self[j][1] and (
-                        self[i] not in pairs or self[j] not in pairs):
+                if self[i][0] == self[j][0] and self[i][1] != self[j][1] and \
+                        (self[i] not in pairs or self[j] not in pairs):
                     pairs += self[i], self[j]
         # Check if the hand only has one pair or multiple
         if len(pairs) == 2:
@@ -219,7 +238,7 @@ class PokerHand:
         else:
             return False
 
-    def two_pair(self):
+    def check_two_pair(self):
         pairs = []
         for i in range(len(self)):
             for j in range(len(self)):
@@ -235,58 +254,55 @@ class PokerHand:
         else:
             return False
 
-    def three_of_a_kind(self):
+    def check_three_of_a_kind(self):
         pass
 
-    def straight(self):
+    def check_straight(self):
         pass
 
-    def flush(self):
+    def check_flush(self):
         pass
 
-    def full_house(self):
+    def check_full_house(self):
         pass
 
-    def four_of_a_kind(self):
+    def check_four_of_a_kind(self):
         pass
 
-    def straight_flush(self):
-        pass
+    def check_straight_flush(self):
+        values = [(c.get_value(), c.get_suit()) for c in self] + [(1, c.get_suit) for c in self if c.get_value() == 14]
+        print(values)
 
 
-community_cards = [(4, Suit.spades), (3, Suit.hearts), (5, Suit.hearts), (6, Suit.spades), (10, Suit.spades)]
-player_1_cards = [(2, Suit.spades), (7, Suit.hearts)]
+community_cards = [(11, Suit.spades), (3, Suit.hearts), (5, Suit.hearts), (5, Suit.spades), (10, Suit.spades)]
+player_1_cards = [(13, Suit.spades), (13, Suit.hearts)]
 cards_to_evaluate = community_cards + player_1_cards
 
-# print("Highest card:", PokerHand.high_card(onHand))
-# print("Pair:", PokerHand.one_pair(onHand))
-# print("Two pairs:", PokerHand.two_pair(onHand))
+
+deck = StandardDeck().create_deck()
+
+for card in deck:
+    print(card.get_value(), card.get_suit())
+
+check = PokerHand.check_straight_flush(deck)
+#print(check)
 
 
-Hand.best_poker_hand(cards_to_evaluate)
+#print(deck[0])
 
-'''
-# full_deck = create_deck()
-deck = []
 
-card_1 = NumberedCard(2, Suit.spades)
-card_2 = NumberedCard(2, Suit.hearts)
+# print(card_1, card_2, card_3)
+#print(card_2)
+#print(card_2.get_value(), card_2.get_suit())
 
-jack_1 = JackCard(Suit.spades)
+# print(cards_to_evaluate)
+# Hand.best_poker_hand(cards_to_evaluate)
 
-deck.append((card_1.get_value(), (card_1.get_suit())))
-deck.append((card_2.get_value(), (card_2.get_suit())))
+# a = deck.create_deck()
+# print(a)
+# StandardDeck.shuffle(a)
+# print(a)
+# j = JackCard(Suit.spades)
+# print(j)
 
-print("card 1:", card_1)
-print("card 2:", card_2)
-# print("Deck:", deck)
-# print(deck[0] < deck[1])
-hand = Hand()
-hand.add_card(card_1)
-hand.add_card(card_2)
-print(hand)
-
-full_deck = StandardDeck()
-print(full_deck.create_deck(), '\n')
-print(random.shuffle(full_deck.create_deck()))
-'''
+# print(type(StandardDeck.create_deck([])))
