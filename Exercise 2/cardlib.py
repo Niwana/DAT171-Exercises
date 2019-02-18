@@ -43,7 +43,11 @@ class NumberedCard(PlayingCards):
 
     def __str__(self):
         """ Returns a readable format of value and suit  """
-        return "{}, {}".format(self.value, self.suit)
+        return "{}, {}".format(self.get_value(), self.get_suit())
+
+    def __repr__(self):
+        """ """
+        return repr((self.get_value(), self.get_suit()))
 
     def get_value(self):
         return self.value
@@ -63,6 +67,10 @@ class JackCard(PlayingCards):
         """ Returns a readable format of value and suit  """
         return "{}, {}".format(self.get_value(), self.get_suit())
 
+    def __repr__(self):
+        """ """
+        return repr((self.get_value(), self.get_suit()))
+
     def get_value(self):
         return 11
 
@@ -80,6 +88,10 @@ class QueenCard(PlayingCards):
     def __str__(self):
         """ Returns a readable format of value and suit  """
         return "{}, {}".format(self.get_value(), self.get_suit())
+
+    def __repr__(self):
+        """ """
+        return repr((self.get_value(), self.get_suit()))
 
     def get_value(self):
         return 12
@@ -99,6 +111,10 @@ class KingCard(PlayingCards):
         """ Returns a readable format of value and suit  """
         return "{}, {}".format(self.get_value(), self.get_suit())
 
+    def __repr__(self):
+        """ """
+        return repr((self.get_value(), self.get_suit()))
+
     def get_value(self):
         return 13
 
@@ -117,6 +133,10 @@ class AceCard(PlayingCards):
         """ Returns a readable format of value and suit  """
         return "{}, {}".format(self.get_value(), self.get_suit())
 
+    def __repr__(self):
+        """ """
+        return repr((self.get_value(), self.get_suit()))
+
     def get_value(self):
         return 14
 
@@ -124,32 +144,35 @@ class AceCard(PlayingCards):
         return self.suit
 
 
-class Hand:
+class Hand():
     def __init__(self):
         self.cards = []
 
     def __str__(self):
         """ Returns a readable format of value and suit  """
-        text = ""
+        hand = []
         for card in self.cards:
-            text += str(card) + "\n"
-        return text
+            hand.append((card.get_value(), card.get_suit()))
+        return repr(hand)
 
     def add_card(self, card):
         return self.cards.append(card)
 
     def remove_card(self, index):
-        pass
+        return self.cards.remove(index)
 
     def sort_cards(self):
         pass
 
-    def best_poker_hand(self):  # best_poker_hand(self, cards=[]):
-        if PokerHand.two_pair(self):
+    def best_poker_hand(self, cards):  # best_poker_hand(self, cards=[]):
+        if PokerHand.check_straight_flush(self+cards):
+            print("Your best hand is a straight flush. Highest card:", PokerHand.check_straight_flush(self+cards))
+       # if full_house
+        elif PokerHand.two_pair(self, cards):
             print("Two pairs:", PokerHand.cards)
-        elif PokerHand.one_pair(self):
+        elif PokerHand.one_pair(self,cards):
             print("One pair:", PokerHand.cards)
-        elif PokerHand.high_card(self):
+        elif PokerHand.high_card(self, cards):
             print("High cards:", PokerHand.cards)
 
 
@@ -160,16 +183,26 @@ class StandardDeck:
         self.cards = []
 
     def __str__(self):
-        """ Returns a readable format of value and suit  """
-        text = ""
-        for card in self.cards:
-            text += str(card) + "\n"
-        return text
+        return str(self.cards)
+
+    def __repr__(self):
+        """ """
+        return repr(self.cards)
+
+    def __len__(self):
+        """ """
+        return 52
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+
+    def __getitem__(self, key):
+        super().__getitem__(key)
 
     def create_deck(self):
         """ Take an empty list and creates a 52 card deck"""
         # Create the numbered cards
-        for i in range(2, 11): # !!! Denna deck skapar 15 st NumberedCards, inga JackCards etc.
+        for i in range(2, 11):  # !!! Denna deck skapar 15 st NumberedCards, inga JackCards etc.
             card = NumberedCard(i, Suit.clubs)
             self.cards.append(card)
         for i in range(2, 11):
@@ -202,7 +235,7 @@ class StandardDeck:
         return self.cards
 
     def shuffle(self):
-        return random.shuffle(self)
+        return random.shuffle(self.cards)
 
 
 class PokerHand(list):
@@ -270,39 +303,54 @@ class PokerHand(list):
         pass
 
     def check_straight_flush(self):
-        values = [(c.get_value(), c.get_suit()) for c in self] + [(1, c.get_suit) for c in self if c.get_value() == 14]
+        values = []
+
+        for c in self:
+            values.append((c.get_value(), c.get_suit()))
+
+        for c in self:
+            if c.get_value() == 14:
+                values.append((1, c.get_suit()))
+
+        for c in reversed(self):
+            found_straight = True
+
+            for k in range(1, 5):
+                if (c.get_value() - k, c.get_suit()) not in values:
+                    found_straight = False
+                    break
+            if found_straight:
+                return c.get_value()
+
         print(values)
 
 
-community_cards = [(11, Suit.spades), (3, Suit.hearts), (5, Suit.hearts), (5, Suit.spades), (10, Suit.spades)]
-player_1_cards = [(13, Suit.spades), (13, Suit.hearts)]
-cards_to_evaluate = community_cards + player_1_cards
+community_cards = [(NumberedCard(1, Suit.spades)), (NumberedCard(2, Suit.spades)), (NumberedCard(3, Suit.spades)),
+                   (NumberedCard(4, Suit.spades)), (NumberedCard(5, Suit.spades))]
+#player_1_cards = [(NumberedCard(6, Suit.spades)), (NumberedCard(7, Suit.spades))]
+
+#cards_to_evaluate = community_cards + player_1_cards
+
+card_1 = NumberedCard(6, Suit.spades)
+card_2 = NumberedCard(4, Suit.spades)
+
+player_1_cards = Hand()
+
+player_1_cards.add_card(card_1)
+player_1_cards.add_card(card_2)
+print(player_1_cards)
+
+player_1_cards.remove_card(card_1)
+print(player_1_cards)
 
 
-deck = StandardDeck().create_deck()
+#print(player_1_cards)
 
-for card in deck:
-    print(card.get_value(), card.get_suit())
-
-check = PokerHand.check_straight_flush(deck)
-#print(check)
-
-
-#print(deck[0])
-
-
-# print(card_1, card_2, card_3)
-#print(card_2)
-#print(card_2.get_value(), card_2.get_suit())
-
-# print(cards_to_evaluate)
-# Hand.best_poker_hand(cards_to_evaluate)
-
-# a = deck.create_deck()
-# print(a)
-# StandardDeck.shuffle(a)
-# print(a)
-# j = JackCard(Suit.spades)
-# print(j)
-
-# print(type(StandardDeck.create_deck([])))
+'''
+    def __str__(self):
+        """ Returns a readable format of value and suit  """
+        text = ""
+        for card in self.cards:
+            text += str(card) + "\n"
+        return text
+'''
