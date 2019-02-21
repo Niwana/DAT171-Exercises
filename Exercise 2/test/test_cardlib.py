@@ -109,25 +109,38 @@ def test_flush():
     card = cardlib.NumberedCard
     suit = cardlib.Suit
 
-    card_1 = card(6, suit.spades)
+    card_1 = card(12, suit.hearts)
     card_2 = card(7, suit.spades)
 
     player_1_cards = cardlib.Hand()
     player_1_cards.add_card(card_1)
     player_1_cards.add_card(card_2)
 
-    card_3 = card(9, suit.spades)
-    player_2_cards = cardlib.Hand()
-    player_2_cards.add_card(card_1)
-    player_2_cards.add_card(card_3)
-
-    community_cards = [(card(2, suit.hearts)), (card(3, suit.spades)), (card(4, suit.spades)),
+    # Create a large list of community cards resulting in multiple flushes, with
+    # 12 of hearts being the highest-ranking card and thus the best flush.
+    community_cards = [(card(2, suit.hearts)), (card(3, suit.hearts)), (card(4, suit.hearts)),
+                       (card(6, suit.hearts)), (card(5, suit.hearts)),
+                       (card(2, suit.spades)), (card(3, suit.spades)), (card(4, suit.spades)),
                        (card(6, suit.spades)), (card(5, suit.spades))]
-
     check = cardlib.PokerHand.check_flush(player_1_cards, community_cards)
-#    check_2 = cardlib.PokerHand.check_flush(player_2_cards, community_cards)
-    print(check)
-#    print(check_2)
 
+    assert check[0] == card_1
 
-test_flush()
+def test_one_pair():
+    card = cardlib.NumberedCard
+    suit = cardlib.Suit
+
+    card_1 = card(12, suit.hearts)
+    card_2 = card(7, suit.spades)
+
+    player_1_cards = cardlib.Hand()
+    player_1_cards.add_card(card_1)
+    player_1_cards.add_card(card_2)
+    community_cards = [(card(7, suit.hearts)), (card(7, suit.clubs)), (card(12, suit.diamonds))]
+
+    check = cardlib.PokerHand.check_one_pair(player_1_cards, community_cards)
+
+    # Assert fungerar ej eftersom vi får tillbaka varje kort som en tuple. I andra tester
+    # är korten en <class 'cardlib.NumberedCard'>. De går ej att jämföra rakt av.
+
+    #assert check[0] == card_1

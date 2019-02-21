@@ -34,7 +34,8 @@ class PlayingCards(metaclass=abc.ABCMeta):
 
     def __repr__(self):
         """ Returns a readable format of value and suit from a list"""
-        return repr((self.get_value(), str(self.get_suit()))) # This gets printed when calling StandardDeck(). Strange?
+        # This gets printed when calling StandardDeck(). Strange?
+        return repr((self.get_value(), str(self.get_suit())))
 
     def __lt__(self, other):
         """ Returns self < other """
@@ -266,28 +267,18 @@ class PokerHand(list):
         PokerHand.cards = highest_card  # Makes it possible to access the cards somewhere else
         return highest_card
 
-    def check_one_pair(self):
-        """ Returns the highest pair if cards_to_evaluate has a pair in it. If no pair is found it returns None. """
-        """
-        pairs = []
-        for i in range(len(self)):
-            for j in range(len(self)):
-                # Check if the value of card i and card j is the same and whether or not they are not already in
-                # the list of pairs
-                if self[i][0] == self[j][0] and self[i][1] != self[j][1] and \
-                        (self[i] not in pairs or self[j] not in pairs):
-                    pairs += self[i], self[j]
-        # Check if the hand only has one pair or multiple
-        if len(pairs) == 2:
-            PokerHand.cards = pairs
-            return True
-        else:
-            return False
-        """
+    def check_one_pair(self, cards=[]):
+        """ Checks for the best pair in a list of cards. If no pair is found it returns None.
 
+        :param cards: List of cards to check in addition of self.
+        :return: A list containing the best pair in seperate tuples for each card. Returns None if no pair is found.
+        """
         pairs = []
         values = []
-        for c in reversed(self):
+        cards = self.cards + cards
+        cards.sort()
+
+        for c in reversed(cards):
             values.append((c.get_value(), c.get_suit()))
         for i in range(len(values)):
             for j in range(len(values)):
@@ -295,9 +286,12 @@ class PokerHand(list):
                 # the list of pairs
                 if values[i][0] == values[j][0] and values[i][1] != values[j][1] and \
                         (values[i] not in pairs or values[j] not in pairs):
-                    pairs += values[i], values[j]
+                    pairs += [values[i], values[j]]
+        #print(pairs)
+        #print(type(pairs))
+        #print(pairs[0])
+        #print(type(pairs[0]))
         # Return the pair with the highest value, return None if no pair exist
-        print(pairs)
         if len(pairs) >= 2:
             return hq.nlargest(2, pairs)
         else:
@@ -305,7 +299,7 @@ class PokerHand(list):
 
     def check_two_pair(self):
         """ Returns the two highest pairs if cards_to_evaluate has at least two pairs in it.
-               If less than two pairs are found it returns None. """
+            If less than two pairs are found it returns None. """
         pairs = []
         values = []
         for card in reversed(self):
@@ -318,14 +312,28 @@ class PokerHand(list):
                         (values[i] not in pairs or values[j] not in pairs):
                     pairs += values[i], values[j]
         # Return the pairs with the highest value, return None if less than two pairs exist
-        print(pairs)
         if len(pairs) >= 4:  # GER FELAKTIGT RESULTAT, KAN EJ HANTERA 3 + 2 KORT
             return hq.nlargest(4, pairs)
         else:
             pass
 
     def check_three_of_a_kind(self):
-        pass
+        triplet = []
+        values = []
+        for c in reversed(self):
+            values.append((c.get_value(), c.get_suit()))
+        for i in range(len(values)):
+            for j in range(len(values)):
+                # Check if the value of card i and card j is the same and whether or not they are not already in
+                # the list of pairs
+                if values[i][0] == values[j][0] and values[i][1] != values[j][1] and \
+                        (values[i] not in triplet or values[j] not in triplet):
+                    triplet += values[i], values[j]
+        # Return the pair with the highest value, return None if no pair exist
+        if len(triplet) >= 3:
+            return hq.nlargest(3, triplet)
+        else:
+            pass
 
     def check_straight(self, cards=[]):
         """ Checks for the best straight in a list of cards.
@@ -353,41 +361,39 @@ class PokerHand(list):
             if found_straight:
                 return card.get_value()
 
-
     def check_flush(self, cards=[]):
-        values = []
+        """ Checks for the best flush in a list of cards. It can handle multiple flushes
+        within a single list of cards.
+
+        :param cards:
+        :return: Returns a list of the five highest cards of the suit with the highest flush.
+        """
         cards = self.cards + cards
-        cards.sort()
-
-        flush_spades = []
-        flush_clubs = []
-        flush_diamonds = []
-        flush_hearts = []
-        print(cards)
-        print(type(cards))
-
-        card = NumberedCard
-        suit = Suit
-
-        #print(cards.count_values(cards, Suit.spades))
+        cards.sort(reverse=True)
+        club_cards = []
+        diamond_cards = []
+        spade_cards = []
+        heart_cards = []
+        list_of_cards = [[], [], [], []]
 
         for card in cards:
-            values.append((card.get_value(), card.get_suit()))
-
-
-        for card in reversed(cards):
-            if card.get_suit() == Suit.spades:
-                flush_spades.append(card)
             if card.get_suit() == Suit.clubs:
-                flush_clubs.append(card)
+                club_cards.append(card)
+                if len(club_cards) >= 5:
+                    list_of_cards[0] = club_cards
             if card.get_suit() == Suit.diamonds:
-                flush_diamonds.append(card)
+                diamond_cards.append(card)
+                if len(diamond_cards) >= 5:
+                    list_of_cards[1] = diamond_cards
+            if card.get_suit() == Suit.spades:
+                spade_cards.append(card)
+                if len(spade_cards) >= 5:
+                    list_of_cards[2] = spade_cards
             if card.get_suit() == Suit.hearts:
-                flush_hearts.append(card)
-        print(len(max(flush_spades)))
-
-#        print(max(flush_spades if (flush_spades) >= 5))
-        #return max((flush_spades if len(flush_spades) >= 5), (flush_clubs if len(flush_clubs) >= 5), (flush_diamonds if len(flush_diamonds) >= 5), (flush_hearts if len(flush_hearts) >= 5))
+                heart_cards.append(card)
+                if len(heart_cards) >= 5:
+                    list_of_cards[3] = heart_cards
+        return max(list_of_cards)[:5]
 
     def check_full_house(self):
         pass
@@ -415,24 +421,4 @@ class PokerHand(list):
                     break
             if found_straight:
                 return card.get_value()
-
-
-
-community_cards = [(NumberedCard(1, Suit.spades)), (NumberedCard(2, Suit.spades)), (NumberedCard(3, Suit.spades)),
-                   (NumberedCard(4, Suit.spades)), (NumberedCard(5, Suit.spades))]
-#player_1_cards = [(NumberedCard(6, Suit.spades)), (NumberedCard(7, Suit.spades))]
-
-#cards_to_evaluate = community_cards + player_1_cards
-
-card_1 = NumberedCard(6, Suit.spades)
-card_2 = NumberedCard(4, Suit.spades)
-
-player_1_cards = Hand()
-
-player_1_cards.add_card(card_1)
-player_1_cards.add_card(card_2)
-
-
-
-
 
