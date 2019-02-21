@@ -51,9 +51,7 @@ def test_hand():
     assert len(hand) == 2
 
     # Test the sort function
-    print(hand)
     hand.sort_cards()
-    print(hand)
     assert (hand[0].get_value(), hand[0].get_suit()) <= (hand[1].get_value(), hand[1].get_suit())
 
     # Test the remove_card function
@@ -65,7 +63,6 @@ def test_deck():
     # Test that all cards are in the deck
     deck_1 = cardlib.StandardDeck()
     deck_1.create_deck()
-    print(deck_1)
 
     # Test the shuffle function
     deck_2 = cardlib.StandardDeck()
@@ -73,12 +70,64 @@ def test_deck():
     deck_2.shuffle()
     assert deck_2 != deck_1
 
-'''
-    a = [(1,cardlib.Suit.clubs),(2,cardlib.Suit.clubs)]
-    b = [(1,cardlib.Suit.clubs),(2,cardlib.Suit.clubs)]
-    c = [(2,cardlib.Suit.clubs),(1,cardlib.Suit.clubs)]
 
-    print(a == c)
-'''
+def test_straight_flush():
+    card = cardlib.NumberedCard
+    suit = cardlib.Suit
 
-test_deck()
+    card_1 = card(6, suit.spades)
+    card_2 = card(7, suit.spades)
+
+    player_1_cards = cardlib.Hand()
+    player_1_cards.add_card(card_1)
+    player_1_cards.add_card(card_2)
+
+    community_cards = [(card(1, suit.spades)), (card(2, suit.spades)), (card(3, suit.spades)),
+                       (card(4, suit.spades)), (card(5, suit.spades))]
+
+    check = cardlib.PokerHand.check_straight_flush(player_1_cards, community_cards)
+    assert check == 7
+
+def test_straight():
+    card = cardlib.NumberedCard
+    suit = cardlib.Suit
+
+    card_1 = card(6, suit.spades)
+    card_2 = card(7, suit.spades)
+
+    player_1_cards = cardlib.Hand()
+    player_1_cards.add_card(card_1)
+    player_1_cards.add_card(card_2)
+
+    community_cards = [(card(2, suit.hearts)), (card(3, suit.clubs)), (card(4, suit.spades)),
+                       (card(4, suit.diamonds)), (card(5, suit.diamonds))]
+
+    check = cardlib.PokerHand.check_straight(player_1_cards, community_cards)
+    assert check == 7
+
+def test_flush():
+    card = cardlib.NumberedCard
+    suit = cardlib.Suit
+
+    card_1 = card(6, suit.spades)
+    card_2 = card(7, suit.spades)
+
+    player_1_cards = cardlib.Hand()
+    player_1_cards.add_card(card_1)
+    player_1_cards.add_card(card_2)
+
+    card_3 = card(9, suit.spades)
+    player_2_cards = cardlib.Hand()
+    player_2_cards.add_card(card_1)
+    player_2_cards.add_card(card_3)
+
+    community_cards = [(card(2, suit.hearts)), (card(3, suit.spades)), (card(4, suit.spades)),
+                       (card(6, suit.spades)), (card(5, suit.spades))]
+
+    check = cardlib.PokerHand.check_flush(player_1_cards, community_cards)
+#    check_2 = cardlib.PokerHand.check_flush(player_2_cards, community_cards)
+    print(check)
+#    print(check_2)
+
+
+test_flush()

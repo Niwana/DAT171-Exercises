@@ -1,7 +1,8 @@
 import enum
 import abc
 import random
-
+import heapq as hq
+import math
 
 # ♣♦♠♥
 
@@ -69,6 +70,14 @@ class NumberedCard(PlayingCards):
     def get_suit(self):
         """ Returns the suit of the card """
         return self.suit
+
+    def count_values(self, value):
+        val = 0
+        for i in self:
+            if i.count(value):
+                print(i.count(value))
+                val += 1
+        return val
 
 
 class JackCard(PlayingCards):
@@ -167,21 +176,35 @@ class Hand:
         """ Sorts the cards on hand from lowest to highest"""
         return self.cards.sort()
 
-    def best_poker_hand(self, cards):
+    def best_poker_hand(self, cards=[]):
+        cards = self.cards + cards
+
         """ Calculates the best poker hand."""
-        if PokerHand.check_straight_flush(self+cards):
-            print("Your best hand is a straight flush. Highest card:", PokerHand.check_straight_flush(self+cards))
-       # if full_house
-        elif PokerHand.two_pair(self, cards):
+        if PokerHand.check_straight_flush(cards):
+            print("Your best hand is a straight flush. Highest card:", PokerHand.check_straight_flush(self, cards))
+        elif PokerHand.check_straight_flush(self, cards):
+            pass
+        elif PokerHand.check_four_of_a_kind(self, cards):
+            pass
+        elif PokerHand.check_full_house(self, cards):
+            pass
+        elif PokerHand.check_flush(self, cards):
+            pass
+        elif PokerHand.check_straight(self, cards):
+            pass
+        elif PokerHand.check_three_of_a_kind(self, cards):
+            pass
+        elif PokerHand.check_two_pair(self, cards):
             print("Two pairs:", PokerHand.cards)
-        elif PokerHand.one_pair(self,cards):
+        elif PokerHand.check_one_pair(self, cards):
             print("One pair:", PokerHand.cards)
-        elif PokerHand.high_card(self, cards):
+        elif PokerHand.check_high_card(self, cards):
             print("High cards:", PokerHand.cards)
 
 
 class StandardDeck:
-    """ Text"""
+    """ A class that represent a standard card game deck, with functions
+    for creating a complete deck and shuffling it."""
 
     def __init__(self):
         self.cards = []
@@ -193,19 +216,17 @@ class StandardDeck:
         return repr(self.cards)
 
     def __eq__(self, other):
-        print(self)
-        print(other)
         return self.cards == other.cards
 
-#    def __len__(self):
-#        """ """
-#        return 52
+    def __len__(self):
+        """ """
+        return 52
 
-#    def __setitem__(self, key, value):
-#        super().__setitem__(key, value)
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
 
-#    def __getitem__(self, key):
-#        super().__getitem__(key)
+    def __getitem__(self, key):
+        super().__getitem__(key)
 
     def create_deck(self):
         """ Creates a standard deck of 52 cards"""
@@ -233,7 +254,9 @@ class PokerHand(list):
         self.cards = cards
 
     def check_high_card(self):
-        """ Takes a list of tuples and return the biggest tuple. Starts with the first element, than the second """
+        """ CChecks for the highest card in a list of cards and returns it.
+           Takes a list of tuples and return the biggest tuple. Starts with the first element, than the second """
+
         highest_card = ()
         for i in range(len(self)):
             if self[i] > highest_card:
@@ -241,10 +264,11 @@ class PokerHand(list):
             else:
                 pass
         PokerHand.cards = highest_card  # Makes it possible to access the cards somewhere else
-        return True
+        return highest_card
 
     def check_one_pair(self):
-        """ Return true if cards_to_evaluate has a pair in it """
+        """ Returns the highest pair if cards_to_evaluate has a pair in it. If no pair is found it returns None. """
+        """
         pairs = []
         for i in range(len(self)):
             for j in range(len(self)):
@@ -259,31 +283,111 @@ class PokerHand(list):
             return True
         else:
             return False
+        """
 
-    def check_two_pair(self):
         pairs = []
-        for i in range(len(self)):
-            for j in range(len(self)):
+        values = []
+        for c in reversed(self):
+            values.append((c.get_value(), c.get_suit()))
+        for i in range(len(values)):
+            for j in range(len(values)):
                 # Check if the value of card i and card j is the same and whether or not they are not already in
                 # the list of pairs
-                if self[i][0] == self[j][0] and self[i][1] != self[j][1] and (
-                        self[i] not in pairs or self[j] not in pairs):
-                    pairs += self[i], self[j]
-        # return pairs
-        if len(pairs) == 4:
-            PokerHand.cards = pairs
-            return True
+                if values[i][0] == values[j][0] and values[i][1] != values[j][1] and \
+                        (values[i] not in pairs or values[j] not in pairs):
+                    pairs += values[i], values[j]
+        # Return the pair with the highest value, return None if no pair exist
+        print(pairs)
+        if len(pairs) >= 2:
+            return hq.nlargest(2, pairs)
         else:
-            return False
+            pass
+
+    def check_two_pair(self):
+        """ Returns the two highest pairs if cards_to_evaluate has at least two pairs in it.
+               If less than two pairs are found it returns None. """
+        pairs = []
+        values = []
+        for card in reversed(self):
+            values.append((card.get_value(), card.get_suit()))
+        for i in range(len(values)):
+            for j in range(len(values)):
+                # Check if the value of card i and card j is the same and whether or not they are not already in
+                # the list of pairs
+                if values[i][0] == values[j][0] and values[i][1] != values[j][1] and \
+                        (values[i] not in pairs or values[j] not in pairs):
+                    pairs += values[i], values[j]
+        # Return the pairs with the highest value, return None if less than two pairs exist
+        print(pairs)
+        if len(pairs) >= 4:  # GER FELAKTIGT RESULTAT, KAN EJ HANTERA 3 + 2 KORT
+            return hq.nlargest(4, pairs)
+        else:
+            pass
 
     def check_three_of_a_kind(self):
         pass
 
-    def check_straight(self):
-        pass
+    def check_straight(self, cards=[]):
+        """ Checks for the best straight in a list of cards.
 
-    def check_flush(self):
-        pass
+        :return: The value of the top card, if no straight is found the return is None.
+        """
+        values = []
+        cards = self.cards + cards
+        cards.sort()
+
+        for card in cards:
+            values.append(card.get_value())
+
+        for card in cards:
+            if card.get_value() == 14:
+                values.append(1)
+
+        for card in reversed(cards):
+            found_straight = True
+
+            for k in range(1, 5):
+                if (card.get_value() - k) not in values:
+                    found_straight = False
+                    break
+            if found_straight:
+                return card.get_value()
+
+
+    def check_flush(self, cards=[]):
+        values = []
+        cards = self.cards + cards
+        cards.sort()
+
+        flush_spades = []
+        flush_clubs = []
+        flush_diamonds = []
+        flush_hearts = []
+        print(cards)
+        print(type(cards))
+
+        card = NumberedCard
+        suit = Suit
+
+        #print(cards.count_values(cards, Suit.spades))
+
+        for card in cards:
+            values.append((card.get_value(), card.get_suit()))
+
+
+        for card in reversed(cards):
+            if card.get_suit() == Suit.spades:
+                flush_spades.append(card)
+            if card.get_suit() == Suit.clubs:
+                flush_clubs.append(card)
+            if card.get_suit() == Suit.diamonds:
+                flush_diamonds.append(card)
+            if card.get_suit() == Suit.hearts:
+                flush_hearts.append(card)
+        print(len(max(flush_spades)))
+
+#        print(max(flush_spades if (flush_spades) >= 5))
+        #return max((flush_spades if len(flush_spades) >= 5), (flush_clubs if len(flush_clubs) >= 5), (flush_diamonds if len(flush_diamonds) >= 5), (flush_hearts if len(flush_hearts) >= 5))
 
     def check_full_house(self):
         pass
@@ -291,28 +395,27 @@ class PokerHand(list):
     def check_four_of_a_kind(self):
         pass
 
-    def check_straight_flush(self):
+    def check_straight_flush(self, cards=[]): # Lägg till suit för vinnande kortet
         values = []
+        cards = self.cards + cards
+        cards.sort()
+        for card in cards:
+            values.append((card.get_value(), card.get_suit()))
 
-        for c in self:
-            values.append((c.get_value(), c.get_suit()))
-            print(c)
+        for card in cards:
+            if card.get_value() == 14:
+                values.append((1, card.get_suit()))
 
-        for c in self:
-            if c.get_value() == 14:
-                values.append((1, c.get_suit()))
-
-        for c in reversed(self):
+        for card in reversed(cards):
             found_straight = True
 
             for k in range(1, 5):
-                if (c.get_value() - k, c.get_suit()) not in values:
+                if (card.get_value() - k, card.get_suit()) not in values:
                     found_straight = False
                     break
             if found_straight:
-                return c.get_value()
+                return card.get_value()
 
-        print(values)
 
 
 community_cards = [(NumberedCard(1, Suit.spades)), (NumberedCard(2, Suit.spades)), (NumberedCard(3, Suit.spades)),
@@ -328,22 +431,8 @@ player_1_cards = Hand()
 
 player_1_cards.add_card(card_1)
 player_1_cards.add_card(card_2)
-#print(player_1_cards)
-
-player_1_cards.remove_card(player_1_cards[0])
-#print(player_1_cards)
 
 
 
 
 
-
-
-'''
-    def __str__(self):
-        """ Returns a readable format of value and suit  """
-        text = ""
-        for card in self.cards:
-            text += str(card) + "\n"
-        return text
-'''
