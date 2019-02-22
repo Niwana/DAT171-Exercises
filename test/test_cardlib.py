@@ -60,16 +60,23 @@ def test_hand():
     # Test the add_card function
     hand.add_card(card(5, cardlib.Suit.spades))
     hand.add_card(card(5, cardlib.Suit.diamonds))
-    assert len(hand) == 2
+    hand.add_card(card(7, cardlib.Suit.diamonds))
+    assert len(hand) == 3
 
     # Test the sort function
     hand.sort_cards()
     assert (hand[0].get_value(), hand[0].get_suit()) <= (hand[1].get_value(), hand[1].get_suit())
 
+    print(hand)
     # Test the remove_card function
-    hand.remove_card(hand[1])
-    assert len(hand) == 1
+    hand.remove_card([0])
+    #hand.remove_card(hand[0])
 
+    #hand.remove_card(hand[0])
+    print(hand)
+#    assert len(hand) == 1
+
+test_hand()
 
 def test_deck():
     """ Test the standard card deck and its associated shuffle function.
@@ -79,6 +86,7 @@ def test_deck():
     # Test that all cards are in the deck
     deck_1 = cardlib.StandardDeck()
     deck_1.create_deck()
+    assert len(deck_1) == 52
 
     # Test the shuffle function
     deck_2 = cardlib.StandardDeck()
@@ -87,27 +95,64 @@ def test_deck():
     assert deck_2 != deck_1
 
 
-def test_one_pair():
-    """ Test the poker hand 'pair'.
+
+card = cardlib.NumberedCard
+suit = cardlib.Suit
+
+
+def test_high_card():
+    """
 
     :return:
     """
-    card = cardlib.NumberedCard
-    suit = cardlib.Suit
-
-    card_1 = card(12, suit.hearts)
+    card_1 = card(9, suit.hearts)
     card_2 = card(7, suit.spades)
 
     player_1_cards = cardlib.Hand()
     player_1_cards.add_card(card_1)
     player_1_cards.add_card(card_2)
-    community_cards = [(card(7, suit.hearts)), (card(7, suit.clubs)), (card(12, suit.diamonds))]
+    community_cards = [(card(2, suit.hearts)), (card(3, suit.clubs)), (card(4, suit.spades)),
+                       (card(4, suit.diamonds)), (card(5, suit.diamonds))]
+
+    print(cardlib.PokerHand.check_high_card(player_1_cards, community_cards))
+
+
+def test_one_pair():
+    """ Test the poker hand 'pair'.
+
+    :return:
+    """
+    card_1 = card(5, suit.hearts)
+    card_2 = card(4, suit.spades)
+
+    player_1_cards = cardlib.Hand()
+    player_1_cards.add_card(card_1)
+    player_1_cards.add_card(card_2)
+    community_cards = [(card(2, suit.hearts)), (card(2, suit.clubs)), (card(4, suit.spades)),
+                       (card(4, suit.diamonds)), (card(5, suit.diamonds))]
+
     check = cardlib.PokerHand.check_one_pair(player_1_cards, community_cards)
+    assert check[0] == card_1
 
-    # Assert fungerar ej eftersom vi får tillbaka varje kort som en tuple. I andra tester
-    # är korten en <class 'cardlib.NumberedCard'>. De går ej att jämföra rakt av.
 
-    # assert check[0] == card_1
+def test_two_pair():
+    """ Test the poker hand 'pair'.
+
+    :return:
+    """
+    card_1 = card(5, suit.hearts)
+    card_2 = card(4, suit.spades)
+
+    player_1_cards = cardlib.Hand()
+    player_1_cards.add_card(card_1)
+    player_1_cards.add_card(card_2)
+    community_cards = [(card(2, suit.hearts)), (card(5, suit.clubs)), (card(4, suit.spades)),
+                       (card(4, suit.diamonds)), (card(5, suit.diamonds))]
+
+    check = cardlib.PokerHand.check_two_pair(player_1_cards, community_cards)
+    print(check)
+
+#test_two_pair()
 
 
 def test_straight():
@@ -115,9 +160,6 @@ def test_straight():
 
     :return:
     """
-    card = cardlib.NumberedCard
-    suit = cardlib.Suit
-
     card_1 = card(6, suit.spades)
     card_2 = card(7, suit.spades)
 
@@ -136,9 +178,6 @@ def test_flush():
 
     :return:
     """
-    card = cardlib.NumberedCard
-    suit = cardlib.Suit
-
     card_1 = card(12, suit.hearts)
     card_2 = card(7, suit.spades)
 
@@ -161,9 +200,6 @@ def test_straight_flush():
 
     :return:
     """
-    card = cardlib.NumberedCard
-    suit = cardlib.Suit
-
     card_1 = card(6, suit.spades)
     card_2 = card(7, suit.spades)
 
