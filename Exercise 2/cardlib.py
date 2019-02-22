@@ -1,7 +1,6 @@
 import enum
 import abc
 import random
-import heapq as hq
 
 # ♣♦♠♥
 
@@ -138,11 +137,10 @@ class AceCard(PlayingCards):
 
 class EmptyDeckError(Exception):
     def __init__(self):
-        """Beskrivning"""
-        #self.value = value
+        """ Raises an error when the user's trying to remove a card from an empty deck. """
 
     def __str__(self):
-        return print("Cannot remove cards from empty deck.")
+        return print("Cannot remove cards from empty deck!!!!!")
 
 
 class Hand:
@@ -171,41 +169,48 @@ class Hand:
 
     def remove_card(self, index=[]):
         """ Removes a card from the players hand. Takes an index as argument, starting from 0."""
-        index.sort(reverse=True)
-        #print(index)
-#        for i in index:
-#            self.cards.remove(i)
-#        return self.cards
-
+        if len(self.cards) > 0:
+            index.sort(reverse=True)
+            for i in index:
+                del self.cards[i]
+            return self.cards
+        else:
+            raise EmptyDeckError
 
     def sort_cards(self):
         """ Sorts the cards on hand from lowest to highest"""
         return self.cards.sort()
 
     def best_poker_hand(self, cards=[]):
-        cards = self.cards + cards
-
         """ Calculates the best poker hand."""
-        if PokerHand.check_straight_flush(cards):
-            print("Your best hand is a straight flush. Highest card:", PokerHand.check_straight_flush(self, cards))
-        elif PokerHand.check_straight_flush(self, cards):
-            pass
+
+        if PokerHand.check_straight_flush(self, cards):
+            print('Straight flush')
+            return PokerHand.check_straight_flush(self, cards)
         elif PokerHand.check_four_of_a_kind(self, cards):
-            pass
+            print('Four of a kind')
+            return PokerHand.check_four_of_a_kind(self)
         elif PokerHand.check_full_house(self, cards):
-            pass
+            print('Full house')
+            return PokerHand.check_full_house(self, cards)
         elif PokerHand.check_flush(self, cards):
-            pass
+            print('Flush')
+            return PokerHand.check_flush(self, cards)
         elif PokerHand.check_straight(self, cards):
-            pass
+            print('straight')
+            return PokerHand.check_straight_flush(self, cards)
         elif PokerHand.check_three_of_a_kind(self, cards):
-            pass
+            print('three')
+            return PokerHand.check_three_of_a_kind(self, cards)
         elif PokerHand.check_two_pair(self, cards):
-            print("Two pairs:", PokerHand.cards)
+            print('two pair')
+            return PokerHand.check_two_pair(self, cards)
         elif PokerHand.check_one_pair(self, cards):
-            print("One pair:", PokerHand.cards)
+            print('one pair')
+            return PokerHand.check_two_pair(self, cards)
         elif PokerHand.check_high_card(self, cards):
-            print("High cards:", PokerHand.cards)
+            print('high')
+            return PokerHand.check_high_card(self, cards)
 
 
 class StandardDeck:
@@ -277,65 +282,53 @@ class PokerHand(Hand):
         """ Checks for the best pair in a list of cards. If no pair is found it returns None.
 
         :param cards: List of cards to check in addition of self.
-        :return: A list containing the best pair in seperate tuples for each card. Returns None if no pair is found.
+        :return: A list containing the best pair in separate tuples for each card. Returns None if no pair is found.
         """
         cards = self.cards + cards
         cards.sort(reverse=True)
+        values = []
         pairs = []
-        print(cards)
 
-        for i in range(len(cards)):
-            for j in range(i+1, len(cards)):
-                if cards[i].get_value() == cards[j].get_value():
-                    if cards[i] not in pairs:
-                        pairs.append(cards[i])
-                    if cards[j] not in pairs:
-                        pairs.append(cards[j])
-        return pairs[:2]
+        for card in cards:
+            values.append(card.get_value())
+        for i, card in enumerate(cards):
+            if (values.count(card.get_value())) == 2 and len(pairs) < 2:
+                pairs.append(card)
+        return pairs
 
     def check_two_pair(self, cards=[]):
-        """ Returns the two highest pairs if cards_to_evaluate has at least two pairs in it.
-            If less than two pairs are found it returns None. """
+        """ Returns the two highest pairs if the list of cards has at least two pairs in it.
+            If less than two pairs are found the function returns None. """
         cards = self.cards + cards
         cards.sort(reverse=True)
-        pairs = []
-        print(cards)
-
-        for i in range(len(cards)):
-            for j in range(i+1, len(cards)):
-                if cards[i].get_value() == cards[j].get_value():
-                    if cards[i] not in pairs:
-                        pairs.append(cards[i])
-                    if cards[j] not in pairs:
-                        pairs.append(cards[j])
-        print(pairs)
-        return pairs[:4]
-
-
-    def check_three_of_a_kind(self, cards):
-        triplet = []
         values = []
+        second_pair = []
+        first_pair = []
+
+        for card in cards:
+            values.append(card.get_value())
+        for card in cards:
+            if (values.count(card.get_value())) >= 2 > len(first_pair):
+                first_pair.append(card)
+        for card in cards:
+            if (values.count(card.get_value())) >= 2 and card.get_value() != first_pair[0].get_value() and len(second_pair) < 2:
+                second_pair.append(card)
+        return first_pair + second_pair
+
+
+    def check_three_of_a_kind(self, cards=[]):
+        """ Checks if the list of cards contain three of a kind. """
         cards = self.cards + cards
-        cards.sort()
-        """
-               for ...
-            if card[i].get_value() == (card[i+1].get_value() and card[i+2].get_value()):
-                triplet.append(card[i], card[i+1], card[i+2])
-        """
-        for c in reversed(cards):
-            values.append((cards.get_value(), cards.get_suit()))
-        for i in range(len(values)):
-            for j in range(len(values)):
-                # Check if the value of card i and card j is the same and whether or not they are not already in
-                # the list of pairs
-                if values[i][0] == values[j][0] and values[i][1] != values[j][1] and \
-                        (values[i] not in triplet or values[j] not in triplet):
-                    triplet += values[i], values[j]
-        # Return the pair with the highest value, return None if no pair exist
-        if len(triplet) >= 3:
-            return hq.nlargest(3, triplet)
-        else:
-            pass
+        cards.sort(reverse=True)
+        values = []
+
+        for card in cards:
+            values.append(card.get_value())
+
+        for i, card in enumerate(cards):
+            if (values.count(card.get_value())) >= 3:
+                return [cards[i], cards[i+1], cards[i+2]]
+
 
     def check_straight(self, cards=[]):
         """ Checks for the best straight in a list of cards.
@@ -362,7 +355,9 @@ class PokerHand(Hand):
                     break
             if found_straight:
                 return card.get_value()
-
+    #===============================================================================================
+    # returnerar en tom lista, ej None vid otillräckliga kort.
+    #===============================================================================================
     def check_flush(self, cards=[]):
         """ Checks for the best flush in a list of cards. It can handle multiple flushes
         within a single list of cards.
@@ -397,13 +392,48 @@ class PokerHand(Hand):
                     list_of_flushes[3] = heart_cards
         return max(list_of_flushes)[:5]
 
-    def check_full_house(self):
-        pass
+    def check_full_house(self, cards=[]):
+        """ Checks for the best full house in a list of cards.
 
-    def check_four_of_a_kind(self):
-        pass
+        :param cards:
+        :return: Returns a list with the triplet first and then the pair.
+        """
+        cards = self.cards + cards
+        cards.sort(reverse=True)
+        values = []
+        pair = []
+        triplet = []
 
-    def check_straight_flush(self, cards=[]): # Lägg till suit för vinnande kortet
+        for card in cards:
+            values.append(card.get_value())
+        for card in cards:
+            if (values.count(card.get_value())) >= 3 > len(triplet):
+                triplet.append(card)
+        if triplet:
+            for card in cards:
+                if (values.count(card.get_value())) >= 2 and card.get_value() != triplet[0].get_value() and len(pair) < 2:
+                    pair.append(card)
+            return triplet + pair
+
+    def check_four_of_a_kind(self, cards=[]):
+        """ Checks if the list of cards contain four of a kind. """
+        cards = self.cards + cards
+        cards.sort(reverse=True)
+        values = []
+        for card in cards:
+            values.append(card.get_value())
+
+        for i, card in enumerate(cards):
+            if (values.count(card.get_value())) >= 4:
+                return [cards[i], cards[i+1], cards[i+2], cards[i+3]]
+                #[cards[i], cards[i+1], cards[i+2], cards[i+3]]
+
+    def check_straight_flush(self, cards=[]):
+        """ Checks a list of cards for the best straight flush.
+
+        :param cards:
+        :return: Returns the highest-ranking card in the flush. If no flush is found it returns None.
+        """
         values = []
         cards = self.cards + cards
         cards.sort(reverse=True)
@@ -422,48 +452,4 @@ class PokerHand(Hand):
                     found_straight = False
                     break
             if found_straight:
-                return card.get_value()
-
-'''
-        for card in cards:
-            values.append((card.get_value(), card.get_suit()))
-
-        for i in range(len(values)):
-            for j in range(len(values)):
-                # Check if the value of card i and card j is the same and whether or not they are not already in
-                # the list of pairs
-                if values[i][0] == values[j][0] and values[i][1] != values[j][1] and \
-                        (values[i] not in pairs or values[j] not in pairs):
-                    pairs += [values[i], values[j]]
-        print('pairs:', pairs)
-        print(type(pairs))
-        #print(pairs[0])
-        print(type(pairs[0]))
-        # Return the pair with the highest value, return None if no pair exist
-        if len(pairs) >= 2:
-            return hq.nlargest(2, pairs)
-        else:
-            pass
-'''
-
-'''
-        list_of_suits = [[], [], [], []]
-        for card in cards:
-            for suit in Suit:
-                if card.get_suit() == suit:
-                    list_of_suits[suit].append(card)
-                    if len(list_of_suits[suit]) >= 5:
-                        list_of_flushes[suit].append(list_of_suits[suit])
-        return max(list_of_flushes)
-'''
-
-'''
-        for card in cards:
-            values.append(card.get_value())
-        for card in cards:
-            values.remove(card.get_value())
-            if card.get_value() in values:
-                pairs.append(card)
-                
-        return hq.nlargest(2, pairs)
-'''
+                return card

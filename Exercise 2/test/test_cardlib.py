@@ -1,5 +1,10 @@
 import cardlib
 
+card = cardlib.NumberedCard
+hand = cardlib.Hand()
+# num_card = cardlib.NumberedCard
+# queen_card =
+suit = cardlib.Suit
 
 
 def test_cards():
@@ -11,21 +16,21 @@ def test_cards():
     assert card_1.get_value() == 2
     assert card_1.get_suit() == 0
 
-    card = cardlib.JackCard(cardlib.Suit.diamonds)
-    assert card.get_value() == 11
-    assert card.get_suit() == 1
+    card_2 = cardlib.JackCard(cardlib.Suit.diamonds)
+    assert card_2.get_value() == 11
+    assert card_2.get_suit() == 1
 
-    card = cardlib.QueenCard(cardlib.Suit.spades)
-    assert card.get_value() == 12
-    assert card.get_suit() == 2
+    card_3 = cardlib.QueenCard(cardlib.Suit.spades)
+    assert card_3.get_value() == 12
+    assert card_3.get_suit() == 2
 
-    card = cardlib.KingCard(cardlib.Suit.diamonds)
-    assert card.get_value() == 13
-    assert card.get_suit() == 1
+    card_4 = cardlib.KingCard(cardlib.Suit.diamonds)
+    assert card_4.get_value() == 13
+    assert card_4.get_suit() == 1
 
-    card = cardlib.AceCard(cardlib.Suit.diamonds)
-    assert card.get_value() == 14
-    assert card.get_suit() == 1
+    card_5 = cardlib.AceCard(cardlib.Suit.diamonds)
+    assert card_5.get_value() == 14
+    assert card_5.get_suit() == 1
 
 
 def test_comparison_of_cards():
@@ -53,10 +58,6 @@ def test_hand():
 
     :return:
     """
-    # Creates a hand of two cards
-    hand = cardlib.Hand()
-    card = cardlib.NumberedCard
-
     # Test the add_card function
     hand.add_card(card(5, cardlib.Suit.spades))
     hand.add_card(card(5, cardlib.Suit.diamonds))
@@ -67,16 +68,12 @@ def test_hand():
     hand.sort_cards()
     assert (hand[0].get_value(), hand[0].get_suit()) <= (hand[1].get_value(), hand[1].get_suit())
 
-    print(hand)
     # Test the remove_card function
+    hand.remove_card([2, 1])
     hand.remove_card([0])
-    #hand.remove_card(hand[0])
 
-    #hand.remove_card(hand[0])
-    print(hand)
-#    assert len(hand) == 1
+    assert len(hand) == 0
 
-test_hand()
 
 def test_deck():
     """ Test the standard card deck and its associated shuffle function.
@@ -94,12 +91,7 @@ def test_deck():
     deck_2.shuffle()
     assert deck_2 != deck_1
 
-
-
-card = cardlib.NumberedCard
-suit = cardlib.Suit
-
-
+# Lägg till en assert!!
 def test_high_card():
     """
 
@@ -132,7 +124,8 @@ def test_one_pair():
                        (card(4, suit.diamonds)), (card(5, suit.diamonds))]
 
     check = cardlib.PokerHand.check_one_pair(player_1_cards, community_cards)
-    assert check[0] == card_1
+    print(check)
+    assert check == [card(5, suit.hearts), card(5, suit.diamonds)]
 
 
 def test_two_pair():
@@ -146,13 +139,25 @@ def test_two_pair():
     player_1_cards = cardlib.Hand()
     player_1_cards.add_card(card_1)
     player_1_cards.add_card(card_2)
-    community_cards = [(card(2, suit.hearts)), (card(5, suit.clubs)), (card(4, suit.spades)),
+    community_cards = [(card(2, suit.hearts)), (card(5, suit.clubs)), (card(1, suit.spades)),
                        (card(4, suit.diamonds)), (card(5, suit.diamonds))]
 
     check = cardlib.PokerHand.check_two_pair(player_1_cards, community_cards)
-    print(check)
+    assert check == [card(5, suit.hearts), card(5, suit.diamonds), card(4, suit.spades), card(4, suit.diamonds)]
 
-#test_two_pair()
+
+def test_three_of_a_kind():
+    card_1 = card(7, suit.hearts)
+    card_2 = card(9, suit.spades)
+
+    player_1_cards = cardlib.Hand()
+    player_1_cards.add_card(card_1)
+    player_1_cards.add_card(card_2)
+    community_cards = [(card(9, suit.hearts)), (card(3, suit.diamonds)), (card(7, suit.clubs)),
+                       (card(7, suit.diamonds)), (card(2, suit.clubs))]
+
+    check = cardlib.PokerHand.check_three_of_a_kind(player_1_cards, community_cards)
+    assert check == [(card(7, suit.hearts)), (card(7, suit.diamonds)), (card(7, suit.clubs))]
 
 
 def test_straight():
@@ -195,6 +200,34 @@ def test_flush():
     assert check[0] == card_1
 
 
+def test_full_house():
+    card_1 = card(7, suit.hearts)
+    card_2 = card(9, suit.spades)
+
+    player_1_cards = cardlib.Hand()
+    player_1_cards.add_card(card_1)
+    player_1_cards.add_card(card_2)
+    community_cards = [(card(9, suit.hearts)), (card(10, suit.spades)), (card(7, suit.clubs)),
+                       (card(10, suit.diamonds)), (card(1, suit.spades)), card(9, suit.clubs)]
+
+    check = cardlib.PokerHand.check_full_house(player_1_cards, community_cards)
+    assert check == [(card(9, suit.hearts)), (card(9, suit.spades)), (card(9, suit.clubs)), (card(10, suit.spades)), (card(10, suit.diamonds))]
+
+
+def test_four_of_a_kind():
+    card_1 = card(7, suit.hearts)
+    card_2 = card(9, suit.spades)
+
+    player_1_cards = cardlib.Hand()
+    player_1_cards.add_card(card_1)
+    player_1_cards.add_card(card_2)
+    community_cards = [(card(9, suit.hearts)), (card(3, suit.diamonds)), (card(7, suit.clubs)),
+                       (card(7, suit.diamonds)), (card(7, suit.spades))]
+
+    check = cardlib.PokerHand.check_four_of_a_kind(player_1_cards, community_cards)
+    assert check == [(card(7, suit.hearts)), (card(7, suit.spades)), (card(7, suit.diamonds)), (card(7, suit.clubs))]
+
+
 def test_straight_flush():
     """ Test the poker hand 'straight flush'.
 
@@ -211,22 +244,26 @@ def test_straight_flush():
                        (card(4, suit.spades)), (card(5, suit.spades))]
 
     check = cardlib.PokerHand.check_straight_flush(player_1_cards, community_cards)
-    assert check == 7
-"""
-def test_three_of_a_kind():
-    card = cardlib.NumberedCard
-    suit = cardlib.Suit
+    assert check == card(7, suit.spades)
 
-    card_1 = card(12, suit.hearts)
-    card_2 = card(7, suit.spades)
+
+def test_best_poker_hand():
+    """ Test the function for determining the best poker hand in a list of cards.
+
+    :return:
+    """
+    deck_1 = cardlib.StandardDeck()
+    deck_1.create_deck()
+
+    card_1 = card(6, suit.spades)
+    card_2 = card(7, suit.hearts)
 
     player_1_cards = cardlib.Hand()
     player_1_cards.add_card(card_1)
     player_1_cards.add_card(card_2)
-    community_cards = [(card(7, suit.hearts)), (card(7, suit.clubs)), (card(12, suit.diamonds))]
+    check_high_card = cardlib.PokerHand.best_poker_hand(player_1_cards)
+    assert check_high_card == card_2
 
-    check = cardlib.PokerHand.check_three_of_a_kind(player_1_cards, community_cards)
-    print(check)
-"""
 
-test_hand()
+
+test_best_poker_hand()
