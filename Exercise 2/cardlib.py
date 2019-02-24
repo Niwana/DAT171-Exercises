@@ -14,11 +14,17 @@ class Suit(enum.IntEnum):
     hearts = 3
 
     def __str__(self):
-        """ Returns the name of the suit. """
-        return self.name
+        """ Returns the name and symbol of the suit. """
+        if self.name == 'clubs':
+            return self.name + ' ♣'
+        if self.name == 'diamonds':
+            return self.name + ' ♦'
+        if self.name == 'spades':
+            return self.name + ' ♠'
+        if self.name == 'hearts':
+            return self.name + ' ♥'
 
 
-# Abstract class
 class PlayingCards(metaclass=abc.ABCMeta):
     """ This is an abstract class for the playing cards. """
 
@@ -27,7 +33,7 @@ class PlayingCards(metaclass=abc.ABCMeta):
 
     def __str__(self):
         """ Returns a readable format of value and suit. """
-        return "{}, {}".format(self.get_value(), self.get_suit())
+        return "{}, {}".format(self.get_value(), str(self.get_suit()))
 
     def __repr__(self):
         """ Returns a readable format of value and suit from a list. """
@@ -145,7 +151,7 @@ class Hand:
         """ Returns a readable format of value and suit. """
         hand = []
         for card in self.cards:
-            hand.append((card.get_value(), card.get_suit()))
+            hand.append((card.get_value(), str(card.get_suit())))
         return repr(hand)
 
     def __getitem__(self, index):
@@ -176,34 +182,14 @@ class Hand:
 
     def best_poker_hand(self, cards=[]):
         """ Calculates the best poker hand. """
+        p = PokerHand
+        functions = [p.check_straight_flush, p.check_four_of_a_kind, p.check_full_house, p.check_flush,
+                     p.check_straight, p.check_three_of_a_kind, p.check_two_pair, p.check_one_pair,
+                     p.check_high_card]
 
-        if PokerHand.check_straight_flush(self, cards):
-            print('Straight flush')
-            return PokerHand.check_straight_flush(self, cards)
-        elif PokerHand.check_four_of_a_kind(self, cards):
-            print('Four of a kind')
-            return PokerHand.check_four_of_a_kind(self)
-        elif PokerHand.check_full_house(self, cards):
-            print('Full house')
-            return PokerHand.check_full_house(self, cards)
-        elif PokerHand.check_flush(self, cards):
-            print('Flush')
-            return PokerHand.check_flush(self, cards)
-        elif PokerHand.check_straight(self, cards):
-            print('straight')
-            return PokerHand.check_straight_flush(self, cards)
-        elif PokerHand.check_three_of_a_kind(self, cards):
-            print('three')
-            return PokerHand.check_three_of_a_kind(self, cards)
-        elif PokerHand.check_two_pair(self, cards):
-            print('two pair')
-            return PokerHand.check_two_pair(self, cards)
-        elif PokerHand.check_one_pair(self, cards):
-            print('one pair')
-            return PokerHand.check_two_pair(self, cards)
-        elif PokerHand.check_high_card(self, cards):
-            print('high')
-            return PokerHand.check_high_card(self, cards)
+        for function in functions:
+            if function(self, cards) is not None:
+                return function(self, cards)
 
 
 class StandardDeck:
@@ -225,11 +211,9 @@ class StandardDeck:
         """ Returns the number of cards in the deck. """
         return len(self.cards)
 
-#    def __setitem__(self, key, value):
-#        super().__setitem__(key, value)
-
-#    def __getitem__(self, key):
-#        super().__getitem__(key)
+    def __getitem__(self, index):
+        """ Returns a card at given index. """
+        return self.cards[index]
 
     def create_deck(self):
         """ Creates a standard deck of 52 cards. """
@@ -249,6 +233,13 @@ class StandardDeck:
     def shuffle(self):
         """ Shuffles the cards in the deck. """
         return shuffle(self.cards)
+
+    def draw_card(self, amount: int):
+        """ Draws the specified amount of cards from the top of the deck. """
+        drawn_cards = []
+        for i in range(amount):
+            drawn_cards.append(self.cards.pop(0))
+        return drawn_cards
 
 
 class PokerHand(Hand):
@@ -277,7 +268,7 @@ class PokerHand(Hand):
         """ Checks for the best pair in a list of cards. If no pair is found it returns None.
 
         :param cards: List of cards to check in addition of self.
-        :return: A list containing the best pair in separate tuples for each card. Returns an empty list if no pair is found.
+        :return: A list containing the best pair in separate tuples for each card. Returns None if no pair is found.
         """
         cards = self.cards + cards
         cards.sort(reverse=True)
@@ -291,13 +282,14 @@ class PokerHand(Hand):
             if (values.count(card.get_value())) == 2 and len(pairs) < 2:
                 pairs.append(card)
 
-        return pairs
+        if pairs:
+            return pairs
 
     def check_two_pair(self, cards=[]):
         """ Returns the two highest pairs if the list of cards has at least two pairs in it.
 
         :param cards: List of cards to check in addition of self.
-        :return: A list containing the best two pairs with the highest pair first. Returns an empty list if no pair is found.
+        :return: A list containing the best two pairs with the highest pair first. Returns None if no pairs are found.
         """
         cards = self.cards + cards
         cards.sort(reverse=True)
@@ -317,10 +309,9 @@ class PokerHand(Hand):
                     len(second_pair) < 2:
                 second_pair.append(card)
 
-        return first_pair + second_pair
+        if first_pair and second_pair:
+            return first_pair + second_pair
 
-
-    # Return None!
     def check_three_of_a_kind(self, cards=[]):
         """ Checks if the list of cards contain three of a kind.
 
@@ -338,8 +329,6 @@ class PokerHand(Hand):
             if (values.count(card.get_value())) >= 3:
                 return [cards[i], cards[i+1], cards[i+2]]
 
-
-# Returns None. Returns only the highest card!
     def check_straight(self, cards=[]):
         """ Checks for the best straight in a list of cards.
 
@@ -348,7 +337,7 @@ class PokerHand(Hand):
         """
         values = []
         cards = self.cards + cards
-        cards.sort()
+        cards.sort(reverse=True)
 
         for card in cards:
             values.append(card.get_value())
@@ -357,7 +346,7 @@ class PokerHand(Hand):
             if card.get_value() == 14:
                 values.append(1)
 
-        for card in reversed(cards):
+        for card in cards:
             found_straight = True
 
             for k in range(1, 5):
@@ -372,7 +361,7 @@ class PokerHand(Hand):
         within a single list of cards (if playing with more than one deck).
 
         :param cards: List of cards to check in addition of self.
-        :return: Returns a list of the five highest cards of the suit with the highest flush. Returns and empty list if
+        :return: Returns a list of the five highest cards of the suit with the highest flush. Returns None if
         no flush is found.
         """
         cards = self.cards + cards
@@ -400,15 +389,16 @@ class PokerHand(Hand):
                 heart_cards.append(card)
                 if len(heart_cards) >= 5:
                     list_of_flushes[3] = heart_cards
-        return max(list_of_flushes)[:5]
 
+        for i in range(len(list_of_flushes)):
+            if list_of_flushes[i]:
+                return max(list_of_flushes)[:5]
 
-# Returns None!
     def check_full_house(self, cards=[]):
         """ Checks for the best full house in a list of cards.
 
         :param cards: List of cards to check in addition of self.
-        :return: Returns a list with the triplet first and then the pair. If no full house if found, returns None.
+        :return: Returns a list with the triplet first and then the pair. Return None if no full house is found.
         """
         cards = self.cards + cards
         cards.sort(reverse=True)
@@ -418,17 +408,19 @@ class PokerHand(Hand):
 
         for card in cards:
             values.append(card.get_value())
+
         for card in cards:
             if (values.count(card.get_value())) >= 3 > len(triplet):
                 triplet.append(card)
+
         if triplet:
             for card in cards:
                 if (values.count(card.get_value())) >= 2 and card.get_value() != triplet[0].get_value() and len(pair) < 2:
                     pair.append(card)
+
+        if triplet and pair:
             return triplet + pair
 
-
-# Returns None!
     def check_four_of_a_kind(self, cards=[]):
         """ Checks if the list of cards contain four of a kind.
 
@@ -445,8 +437,6 @@ class PokerHand(Hand):
             if (values.count(card.get_value())) >= 4:
                 return [cards[i], cards[i+1], cards[i+2], cards[i+3]]
 
-
-# Returns None! Returns only the highest card
     def check_straight_flush(self, cards=[]):
         """ Checks a list of cards for the best straight flush.
 
@@ -472,3 +462,33 @@ class PokerHand(Hand):
                     break
             if found_straight:
                 return [card]
+
+'''
+        if PokerHand.check_straight_flush(self, cards):
+            print('Straight flush')
+            return PokerHand.check_straight_flush(self, cards)
+        elif PokerHand.check_four_of_a_kind(self, cards):
+            print('Four of a kind')
+            return PokerHand.check_four_of_a_kind(self, cards)
+        elif PokerHand.check_full_house(self, cards):
+            print('Full house')
+            return PokerHand.check_full_house(self, cards)
+        elif PokerHand.check_flush(self, cards):
+            print('Flush')
+            return PokerHand.check_flush(self, cards)
+        elif PokerHand.check_straight(self, cards):
+            print('straight')
+            return PokerHand.check_straight(self, cards)
+        elif PokerHand.check_three_of_a_kind(self, cards):
+            print('three')
+            return PokerHand.check_three_of_a_kind(self, cards)
+        elif PokerHand.check_two_pair(self, cards):
+            print('two pair')
+            return PokerHand.check_two_pair(self, cards)
+        elif PokerHand.check_one_pair(self, cards):
+            print('one pair')
+            return PokerHand.check_one_pair(self, cards)
+        elif PokerHand.check_high_card(self, cards):
+            print('high')
+            return PokerHand.check_high_card(self, cards)
+'''
