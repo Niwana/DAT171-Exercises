@@ -304,8 +304,8 @@ class PokerHand(Hand):
                 first_pair.append(card)
 
         for card in cards:
-            if (values.count(card.get_value())) >= 2 and card.get_value() != first_pair[0].get_value() and \
-                    len(second_pair) < 2:
+            if (values.count(card.get_value())) >= 2 > len(
+                    second_pair) and card.get_value() != first_pair[0].get_value():
                 second_pair.append(card)
 
         if first_pair and second_pair:
@@ -414,7 +414,7 @@ class PokerHand(Hand):
 
         if triplet:
             for card in cards:
-                if (values.count(card.get_value())) >= 2 and card.get_value() != triplet[0].get_value() and len(pair) < 2:
+                if (values.count(card.get_value())) >= 2 > len(pair) and card.get_value() != triplet[0].get_value():
                     pair.append(card)
 
         if triplet and pair:
@@ -461,33 +461,3 @@ class PokerHand(Hand):
                     break
             if found_straight:
                 return [card]
-
-'''
-        if PokerHand.check_straight_flush(self, cards):
-            print('Straight flush')
-            return PokerHand.check_straight_flush(self, cards)
-        elif PokerHand.check_four_of_a_kind(self, cards):
-            print('Four of a kind')
-            return PokerHand.check_four_of_a_kind(self, cards)
-        elif PokerHand.check_full_house(self, cards):
-            print('Full house')
-            return PokerHand.check_full_house(self, cards)
-        elif PokerHand.check_flush(self, cards):
-            print('Flush')
-            return PokerHand.check_flush(self, cards)
-        elif PokerHand.check_straight(self, cards):
-            print('straight')
-            return PokerHand.check_straight(self, cards)
-        elif PokerHand.check_three_of_a_kind(self, cards):
-            print('three')
-            return PokerHand.check_three_of_a_kind(self, cards)
-        elif PokerHand.check_two_pair(self, cards):
-            print('two pair')
-            return PokerHand.check_two_pair(self, cards)
-        elif PokerHand.check_one_pair(self, cards):
-            print('one pair')
-            return PokerHand.check_one_pair(self, cards)
-        elif PokerHand.check_high_card(self, cards):
-            print('high')
-            return PokerHand.check_high_card(self, cards)
-'''

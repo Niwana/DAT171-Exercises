@@ -245,13 +245,15 @@ def test_best_poker_hand():
     community_cards = [(num_card(3, suit.diamonds)), (num_card(8, suit.spades)), (num_card(3, suit.spades)),
                        (num_card(4, suit.clubs)), (ace_card(suit.spades))]
     check_two_pairs = player_1_cards.best_poker_hand(community_cards)
-    assert check_two_pairs == [ace_card(suit.hearts), ace_card(suit.spades), num_card(3, suit.spades), num_card(3, suit.diamonds)]
+    assert check_two_pairs == [ace_card(suit.hearts), ace_card(suit.spades),
+                               num_card(3, suit.spades), num_card(3, suit.diamonds)]
 
     # Three of a kind
     community_cards = [(num_card(3, suit.diamonds)), (num_card(3, suit.clubs)), (num_card(3, suit.spades)),
                        (num_card(4, suit.clubs)), (num_card(2, suit.spades))]
     check_three_of_a_kind = player_1_cards.best_poker_hand(community_cards)
-    assert check_three_of_a_kind == [(num_card(3, suit.spades)), (num_card(3, suit.diamonds)), (num_card(3, suit.clubs))]
+    assert check_three_of_a_kind == [(num_card(3, suit.spades)),
+                                     (num_card(3, suit.diamonds)), (num_card(3, suit.clubs))]
 
     # Straight
     community_cards = [(num_card(7, suit.diamonds)), (num_card(5, suit.clubs)), (num_card(8, suit.spades)),
@@ -264,14 +266,14 @@ def test_best_poker_hand():
                        (num_card(4, suit.hearts)), (num_card(2, suit.spades))]
     check_flush = player_1_cards.best_poker_hand(community_cards)
     assert check_flush == [(ace_card(suit.hearts)), (num_card(4, suit.hearts)), (num_card(3, suit.hearts)),
-                                     (num_card(3, suit.hearts)), (num_card(3, suit.hearts))]
+                           (num_card(3, suit.hearts)), (num_card(3, suit.hearts))]
 
     # Full house
     community_cards = [(ace_card(suit.diamonds)), (num_card(3, suit.clubs)), (num_card(3, suit.spades)),
                        (num_card(3, suit.clubs)), (num_card(2, suit.spades))]
     check_full_house = player_1_cards.best_poker_hand(community_cards)
     assert check_full_house == [(num_card(3, suit.spades)), (num_card(3, suit.clubs)), (num_card(3, suit.clubs)),
-                                     (ace_card(suit.hearts)), (ace_card(suit.diamonds))]
+                                (ace_card(suit.hearts)), (ace_card(suit.diamonds))]
 
     # Four of a kind
     community_cards = [(num_card(3, suit.diamonds)), (num_card(3, suit.clubs)), (num_card(3, suit.spades)),

@@ -1,0 +1,423 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Welcome to Card library’s documentation! &#8212; Card library 2019-02-24 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-card-library-s-documentation">
+<h1>Welcome to Card library’s documentation!<a class="headerlink" href="#welcome-to-card-library-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>This is the documentation for a library of a standard playing card created
+for computer assignment 2 in DAT171 Object oriented programming in Python.</p>
+<div class="toctree-wrapper compound">
+</div>
+<span class="target" id="module-cardlib"></span><dl class="class">
+<dt id="cardlib.AceCard">
+<em class="property">class </em><code class="descclassname">cardlib.</code><code class="descname">AceCard</code><span class="sig-paren">(</span><em>suit: cardlib.Suit</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.AceCard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cardlib.PlayingCards" title="cardlib.PlayingCards"><code class="xref py py-class docutils literal notranslate"><span class="pre">cardlib.PlayingCards</span></code></a></p>
+<p>Creates the Ace card of a given suit.</p>
+<dl class="method">
+<dt id="cardlib.AceCard.get_suit">
+<code class="descname">get_suit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.AceCard.get_suit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the suit of the card.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.AceCard.get_value">
+<code class="descname">get_value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.AceCard.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the card.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="cardlib.EmptyDeckError">
+<em class="property">exception </em><code class="descclassname">cardlib.</code><code class="descname">EmptyDeckError</code><a class="headerlink" href="#cardlib.EmptyDeckError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cardlib.JackCard">
+<em class="property">class </em><code class="descclassname">cardlib.</code><code class="descname">JackCard</code><span class="sig-paren">(</span><em>suit: cardlib.Suit</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.JackCard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cardlib.PlayingCards" title="cardlib.PlayingCards"><code class="xref py py-class docutils literal notranslate"><span class="pre">cardlib.PlayingCards</span></code></a></p>
+<p>Creates the Jack card of a given suit.</p>
+<dl class="method">
+<dt id="cardlib.JackCard.get_suit">
+<code class="descname">get_suit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.JackCard.get_suit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the suit of the card.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.JackCard.get_value">
+<code class="descname">get_value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.JackCard.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the card.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cardlib.KingCard">
+<em class="property">class </em><code class="descclassname">cardlib.</code><code class="descname">KingCard</code><span class="sig-paren">(</span><em>suit: cardlib.Suit</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.KingCard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cardlib.PlayingCards" title="cardlib.PlayingCards"><code class="xref py py-class docutils literal notranslate"><span class="pre">cardlib.PlayingCards</span></code></a></p>
+<p>Creates the King card of a given suit.</p>
+<dl class="method">
+<dt id="cardlib.KingCard.get_suit">
+<code class="descname">get_suit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.KingCard.get_suit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the suit of the card.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.KingCard.get_value">
+<code class="descname">get_value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.KingCard.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the card.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cardlib.NumberedCard">
+<em class="property">class </em><code class="descclassname">cardlib.</code><code class="descname">NumberedCard</code><span class="sig-paren">(</span><em>value: int</em>, <em>suit: cardlib.Suit</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.NumberedCard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cardlib.PlayingCards" title="cardlib.PlayingCards"><code class="xref py py-class docutils literal notranslate"><span class="pre">cardlib.PlayingCards</span></code></a></p>
+<p>Creates a card of a given value and suit. Only used for cards 2-10.</p>
+<dl class="method">
+<dt id="cardlib.NumberedCard.get_suit">
+<code class="descname">get_suit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.NumberedCard.get_suit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the suit of the card.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.NumberedCard.get_value">
+<code class="descname">get_value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.NumberedCard.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the card.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cardlib.PlayingCards">
+<em class="property">class </em><code class="descclassname">cardlib.</code><code class="descname">PlayingCards</code><span class="sig-paren">(</span><em>suit: cardlib.Suit</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.PlayingCards" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is an abstract class for the playing cards.</p>
+<dl class="method">
+<dt id="cardlib.PlayingCards.get_suit">
+<code class="descname">get_suit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.PlayingCards.get_suit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the suit of the card.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.PlayingCards.get_value">
+<code class="descname">get_value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.PlayingCards.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the card.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cardlib.PokerHand">
+<em class="property">class </em><code class="descclassname">cardlib.</code><code class="descname">PokerHand</code><span class="sig-paren">(</span><em>cards</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.PokerHand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cardlib.Hand</span></code></p>
+<p>A class that represent the poker hand with functions for identifying the best poker hand.</p>
+<dl class="method">
+<dt id="cardlib.PokerHand.check_flush">
+<code class="descname">check_flush</code><span class="sig-paren">(</span><em>cards=[]</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.PokerHand.check_flush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks for the best flush in a list of cards. It can handle multiple flushes
+within a single list of cards (if playing with more than one deck).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cards</strong> – List of cards to check in addition of self.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Returns a list of the five highest cards of the suit with the highest flush. Returns None if</td>
+</tr>
+</tbody>
+</table>
+<p>no flush is found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.PokerHand.check_four_of_a_kind">
+<code class="descname">check_four_of_a_kind</code><span class="sig-paren">(</span><em>cards=[]</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.PokerHand.check_four_of_a_kind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the list of cards contain four of a kind.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cards</strong> – List of cards to check in addition of self.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Returns a list containing four cards. Returns None if no four of a kind is found.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.PokerHand.check_full_house">
+<code class="descname">check_full_house</code><span class="sig-paren">(</span><em>cards=[]</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.PokerHand.check_full_house" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks for the best full house in a list of cards.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cards</strong> – List of cards to check in addition of self.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Returns a list with the triplet first and then the pair. Return None if no full house is found.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.PokerHand.check_high_card">
+<code class="descname">check_high_card</code><span class="sig-paren">(</span><em>cards=[]</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.PokerHand.check_high_card" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks for the highest card in a list of cards and returns it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cards</strong> – List of cards to check in addition of self.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The card with the highest value.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.PokerHand.check_one_pair">
+<code class="descname">check_one_pair</code><span class="sig-paren">(</span><em>cards=[]</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.PokerHand.check_one_pair" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks for the best pair in a list of cards. If no pair is found it returns None.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cards</strong> – List of cards to check in addition of self.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list containing the best pair in separate tuples for each card. Returns None if no pair is found.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.PokerHand.check_straight">
+<code class="descname">check_straight</code><span class="sig-paren">(</span><em>cards=[]</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.PokerHand.check_straight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks for the best straight in a list of cards.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cards</strong> – List of cards to check in addition of self.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The the highest value card in the straight. Returns None if no straight is found.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.PokerHand.check_straight_flush">
+<code class="descname">check_straight_flush</code><span class="sig-paren">(</span><em>cards=[]</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.PokerHand.check_straight_flush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks a list of cards for the best straight flush.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cards</strong> – List of cards to check in addition of self.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Returns the highest-ranking card in the flush. If no flush is found it returns None.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.PokerHand.check_three_of_a_kind">
+<code class="descname">check_three_of_a_kind</code><span class="sig-paren">(</span><em>cards=[]</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.PokerHand.check_three_of_a_kind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the list of cards contain three of a kind.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cards</strong> – List of cards to check in addition of self.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list containing the three cards as tuples. Returns None if no pair is found.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.PokerHand.check_two_pair">
+<code class="descname">check_two_pair</code><span class="sig-paren">(</span><em>cards=[]</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.PokerHand.check_two_pair" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the two highest pairs if the list of cards has at least two pairs in it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cards</strong> – List of cards to check in addition of self.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list containing the best two pairs with the highest pair first. Returns None if no pairs are found.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cardlib.QueenCard">
+<em class="property">class </em><code class="descclassname">cardlib.</code><code class="descname">QueenCard</code><span class="sig-paren">(</span><em>suit: cardlib.Suit</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.QueenCard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cardlib.PlayingCards" title="cardlib.PlayingCards"><code class="xref py py-class docutils literal notranslate"><span class="pre">cardlib.PlayingCards</span></code></a></p>
+<p>Creates the Queen card of a given suit.</p>
+<dl class="method">
+<dt id="cardlib.QueenCard.get_suit">
+<code class="descname">get_suit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.QueenCard.get_suit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the suit of the card.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.QueenCard.get_value">
+<code class="descname">get_value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.QueenCard.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the card.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cardlib.StandardDeck">
+<em class="property">class </em><code class="descclassname">cardlib.</code><code class="descname">StandardDeck</code><a class="headerlink" href="#cardlib.StandardDeck" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class that represent a standard card game deck, with functions
+for creating a complete deck and shuffling it.</p>
+<dl class="method">
+<dt id="cardlib.StandardDeck.create_deck">
+<code class="descname">create_deck</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.StandardDeck.create_deck" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a standard deck of 52 cards.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.StandardDeck.draw_card">
+<code class="descname">draw_card</code><span class="sig-paren">(</span><em>amount: int</em><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.StandardDeck.draw_card" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws the specified amount of cards from the top of the deck.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cardlib.StandardDeck.shuffle">
+<code class="descname">shuffle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cardlib.StandardDeck.shuffle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shuffles the cards in the deck.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cardlib.Suit">
+<em class="property">class </em><code class="descclassname">cardlib.</code><code class="descname">Suit</code><a class="headerlink" href="#cardlib.Suit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.IntEnum</span></code></p>
+<p>Class Suit contains the four suits (club, diamond, spade, heart) and their respective order
+(club &lt; diamond &lt; spade &lt; heart)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">Card library</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Andreas Gelotte, Martin Vanky.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
