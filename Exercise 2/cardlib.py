@@ -184,8 +184,7 @@ class Hand:
         """ Calculates the best poker hand. """
         p = PokerHand
         functions = [p.check_straight_flush, p.check_four_of_a_kind, p.check_full_house, p.check_flush,
-                     p.check_straight, p.check_three_of_a_kind, p.check_two_pair, p.check_one_pair,
-                     p.check_high_card]
+                     p.check_straight, p.check_three_of_a_kind, p.check_two_pair, p.check_one_pair, p.check_high_card]
 
         for function in functions:
             if function(self, cards) is not None:
