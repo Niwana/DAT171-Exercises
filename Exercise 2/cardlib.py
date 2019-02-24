@@ -1,6 +1,6 @@
 import enum
 import abc
-import random
+from random import shuffle
 
 # ♣♦♠♥
 
@@ -14,24 +14,23 @@ class Suit(enum.IntEnum):
     hearts = 3
 
     def __str__(self):
-        """ Return the name of the enum value """
+        """ Returns the name of the suit. """
         return self.name
 
 
 # Abstract class
 class PlayingCards(metaclass=abc.ABCMeta):
-    """ This is an abstract class for the playing cards """
+    """ This is an abstract class for the playing cards. """
 
     def __init__(self, suit: Suit):
-        """ """
         self.suit = suit
 
     def __str__(self):
-        """ Returns a readable format of value and suit """
+        """ Returns a readable format of value and suit. """
         return "{}, {}".format(self.get_value(), self.get_suit())
 
     def __repr__(self):
-        """ Returns a readable format of value and suit from a list"""
+        """ Returns a readable format of value and suit from a list. """
         # This gets printed when calling StandardDeck(). Strange?
         return repr((self.get_value(), str(self.get_suit())))
 
@@ -40,98 +39,93 @@ class PlayingCards(metaclass=abc.ABCMeta):
         return (self.get_value(), self.get_suit()) < (other.get_value(), other.get_suit())
 
     def __eq__(self, other):
-        """ Returns self == other"""
+        """ Returns self == other """
         return (self.get_value(), self.get_suit()) == (other.get_value(), other.get_suit())
 
     @abc.abstractmethod
     def get_value(self):
-        """ Returns the value of the card """
+        """ Returns the value of the card. """
         raise NotImplementedError("Derived class did not override this method")
 
     @abc.abstractmethod
     def get_suit(self):
-        """ Returns the suit of the card """
+        """ Returns the suit of the card. """
         raise NotImplementedError("Derived class did not override this method")
 
 
 class NumberedCard(PlayingCards):
-    """ Creates a card of a given value and suit """
+    """ Creates a card of a given value and suit. Only used for cards 2-10. """
 
     def __init__(self, value: int, suit: Suit):
-        """ """
         self.value = value
         super().__init__(suit)
 
     def get_value(self):
-        """ Returns the value of the card """
+        """ Returns the value of the card. """
         return self.value
 
     def get_suit(self):
-        """ Returns the suit of the card """
+        """ Returns the suit of the card. """
         return self.suit
 
 
 class JackCard(PlayingCards):
-    """ Creates the Jack card of a given suit"""
+    """ Creates the Jack card of a given suit. """
 
     def __init__(self, suit: Suit):
-        """ """
         super().__init__(suit)
 
     def get_value(self):
-        """ Returns the value of the card """
+        """ Returns the value of the card. """
         return 11
 
     def get_suit(self):
-        """ Returns the suit of the card """
+        """ Returns the suit of the card. """
         return self.suit
 
 
 class QueenCard(PlayingCards):
-    """ Creates the Queen card of a given suit"""
+    """ Creates the Queen card of a given suit. """
 
     def __init__(self, suit: Suit):
-        """ """
         super().__init__(suit)
 
     def get_value(self):
-        """ Returns the value of the card """
+        """ Returns the value of the card. """
         return 12
 
     def get_suit(self):
-        """ Returns the suit of the card """
+        """ Returns the suit of the card. """
         return self.suit
 
 
 class KingCard(PlayingCards):
-    """ Creates the King card of a given suit"""
+    """ Creates the King card of a given suit. """
 
     def __init__(self, suit: Suit):
-        """ """
         super().__init__(suit)
 
     def get_value(self):
-        """ Returns the value of the card """
+        """ Returns the value of the card. """
         return 13
 
     def get_suit(self):
-        """ Returns the suit of the card """
+        """ Returns the suit of the card. """
         return self.suit
 
 
 class AceCard(PlayingCards):
-    """ Creates the Ace card of a given suit"""
+    """ Creates the Ace card of a given suit. """
 
     def __init__(self, suit: Suit):
-        """ """
         super().__init__(suit)
 
     def get_value(self):
-        """ Returns the value of the card """
+        """ Returns the value of the card. """
         return 14
 
     def get_suit(self):
-        """ Returns the suit of the card """
+        """ Returns the suit of the card. """
         return self.suit
 
 
@@ -140,35 +134,34 @@ class EmptyDeckError(Exception):
         """ Raises an error when the user's trying to remove a card from an empty deck. """
 
     def __str__(self):
-        return print("Cannot remove cards from empty deck!!!!!")
+        return print("Cannot remove cards from empty deck!")
 
 
 class Hand:
     def __init__(self):
-        """ """
         self.cards = []
 
     def __str__(self):
-        """ Returns a readable format of value and suit """
+        """ Returns a readable format of value and suit. """
         hand = []
         for card in self.cards:
             hand.append((card.get_value(), card.get_suit()))
         return repr(hand)
 
     def __getitem__(self, index):
-        """ Returns a card at given index """
+        """ Returns a card at given index. """
         return self.cards[index]
 
     def __len__(self):
-        """ Returns the number of cards in hand """
+        """ Returns the number of cards in hand. """
         return len(self.cards)
 
     def add_card(self, card):
         """ Adds a card to the players hand. Takes a card as argument"""
         return self.cards.append(card)
 
-    def remove_card(self, index=[]):
-        """ Removes a card from the players hand. Takes an index as argument, starting from 0."""
+    def remove_card(self, index):
+        """ Removes a card from the players hand. Takes a list containing indices as argument. """
         if len(self.cards) > 0:
             index.sort(reverse=True)
             for i in index:
@@ -178,11 +171,11 @@ class Hand:
             raise EmptyDeckError
 
     def sort_cards(self):
-        """ Sorts the cards on hand from lowest to highest"""
+        """ Sorts the cards on hand from lowest to highest. """
         return self.cards.sort()
 
     def best_poker_hand(self, cards=[]):
-        """ Calculates the best poker hand."""
+        """ Calculates the best poker hand. """
 
         if PokerHand.check_straight_flush(self, cards):
             print('Straight flush')
@@ -215,22 +208,21 @@ class Hand:
 
 class StandardDeck:
     """ A class that represent a standard card game deck, with functions
-    for creating a complete deck and shuffling it."""
+    for creating a complete deck and shuffling it. """
 
     def __init__(self):
         self.cards = []
 
-#    def __str__(self): # This never gets called
-#        return str(self.cards)
-
     def __repr__(self):
+        """ Returns a readable format of the deck. """
         return repr(self.cards)
 
     def __eq__(self, other):
+        """ Makes it possible to compare if two decks are the same. """
         return self.cards == other.cards
 
     def __len__(self):
-        """ """
+        """ Returns the number of cards in the deck. """
         return len(self.cards)
 
 #    def __setitem__(self, key, value):
@@ -240,7 +232,7 @@ class StandardDeck:
 #        super().__getitem__(key)
 
     def create_deck(self):
-        """ Creates a standard deck of 52 cards"""
+        """ Creates a standard deck of 52 cards. """
         for i in range(9):
             for suit in Suit:
                 self.cards.append(NumberedCard(i + 2, suit))
@@ -255,11 +247,12 @@ class StandardDeck:
         return self.cards
 
     def shuffle(self):
-        return random.shuffle(self.cards)
+        """ Shuffles the cards in the deck. """
+        return shuffle(self.cards)
 
 
 class PokerHand(Hand):
-    """ A class that represent the poker hand with functions for identifying the best poker hand."""
+    """ A class that represent the poker hand with functions for identifying the best poker hand. """
 
     def __init__(self, cards):
         super().__init__()
@@ -267,22 +260,24 @@ class PokerHand(Hand):
 
     def check_high_card(self, cards=[]):
         """ Checks for the highest card in a list of cards and returns it.
-           Takes a list of tuples and return the biggest tuple. Starts with the first element, then the second etc"""
 
+        :param cards: List of cards to check in addition of self.
+        :return: The card with the highest value.
+        """
         cards = self.cards + cards
         highest_card = cards[0]
 
         for card in cards:
             if card > highest_card:
                 highest_card = card
-        PokerHand.cards = highest_card  # Makes it possible to access the cards somewhere else
-        return highest_card
+
+        return [highest_card]
 
     def check_one_pair(self, cards=[]):
         """ Checks for the best pair in a list of cards. If no pair is found it returns None.
 
         :param cards: List of cards to check in addition of self.
-        :return: A list containing the best pair in separate tuples for each card. Returns None if no pair is found.
+        :return: A list containing the best pair in separate tuples for each card. Returns an empty list if no pair is found.
         """
         cards = self.cards + cards
         cards.sort(reverse=True)
@@ -291,14 +286,19 @@ class PokerHand(Hand):
 
         for card in cards:
             values.append(card.get_value())
-        for i, card in enumerate(cards):
+
+        for card in cards:
             if (values.count(card.get_value())) == 2 and len(pairs) < 2:
                 pairs.append(card)
+
         return pairs
 
     def check_two_pair(self, cards=[]):
         """ Returns the two highest pairs if the list of cards has at least two pairs in it.
-            If less than two pairs are found the function returns None. """
+
+        :param cards: List of cards to check in addition of self.
+        :return: A list containing the best two pairs with the highest pair first. Returns an empty list if no pair is found.
+        """
         cards = self.cards + cards
         cards.sort(reverse=True)
         values = []
@@ -307,17 +307,26 @@ class PokerHand(Hand):
 
         for card in cards:
             values.append(card.get_value())
+
         for card in cards:
             if (values.count(card.get_value())) >= 2 > len(first_pair):
                 first_pair.append(card)
+
         for card in cards:
-            if (values.count(card.get_value())) >= 2 and card.get_value() != first_pair[0].get_value() and len(second_pair) < 2:
+            if (values.count(card.get_value())) >= 2 and card.get_value() != first_pair[0].get_value() and \
+                    len(second_pair) < 2:
                 second_pair.append(card)
+
         return first_pair + second_pair
 
 
+    # Return None!
     def check_three_of_a_kind(self, cards=[]):
-        """ Checks if the list of cards contain three of a kind. """
+        """ Checks if the list of cards contain three of a kind.
+
+        :param cards: List of cards to check in addition of self.
+        :return: A list containing the three cards as tuples. Returns None if no pair is found.
+        """
         cards = self.cards + cards
         cards.sort(reverse=True)
         values = []
@@ -330,10 +339,12 @@ class PokerHand(Hand):
                 return [cards[i], cards[i+1], cards[i+2]]
 
 
+# Returns None. Returns only the highest card!
     def check_straight(self, cards=[]):
         """ Checks for the best straight in a list of cards.
 
-        :return: The value of the top card, if no straight is found the return is None.
+        :param cards: List of cards to check in addition of self.
+        :return: The the highest value card in the straight. Returns None if no straight is found.
         """
         values = []
         cards = self.cards + cards
@@ -354,16 +365,15 @@ class PokerHand(Hand):
                     found_straight = False
                     break
             if found_straight:
-                return card.get_value()
-    #===============================================================================================
-    # returnerar en tom lista, ej None vid otillräckliga kort.
-    #===============================================================================================
+                return [card]
+
     def check_flush(self, cards=[]):
         """ Checks for the best flush in a list of cards. It can handle multiple flushes
-        within a single list of cards.
+        within a single list of cards (if playing with more than one deck).
 
-        :param cards:
-        :return: Returns a list of the five highest cards of the suit with the highest flush.
+        :param cards: List of cards to check in addition of self.
+        :return: Returns a list of the five highest cards of the suit with the highest flush. Returns and empty list if
+        no flush is found.
         """
         cards = self.cards + cards
         cards.sort(reverse=True)
@@ -392,11 +402,13 @@ class PokerHand(Hand):
                     list_of_flushes[3] = heart_cards
         return max(list_of_flushes)[:5]
 
+
+# Returns None!
     def check_full_house(self, cards=[]):
         """ Checks for the best full house in a list of cards.
 
-        :param cards:
-        :return: Returns a list with the triplet first and then the pair.
+        :param cards: List of cards to check in addition of self.
+        :return: Returns a list with the triplet first and then the pair. If no full house if found, returns None.
         """
         cards = self.cards + cards
         cards.sort(reverse=True)
@@ -415,8 +427,14 @@ class PokerHand(Hand):
                     pair.append(card)
             return triplet + pair
 
+
+# Returns None!
     def check_four_of_a_kind(self, cards=[]):
-        """ Checks if the list of cards contain four of a kind. """
+        """ Checks if the list of cards contain four of a kind.
+
+        :param cards: List of cards to check in addition of self.
+        :return: Returns a list containing four cards. Returns None if no four of a kind is found.
+        """
         cards = self.cards + cards
         cards.sort(reverse=True)
         values = []
@@ -426,12 +444,13 @@ class PokerHand(Hand):
         for i, card in enumerate(cards):
             if (values.count(card.get_value())) >= 4:
                 return [cards[i], cards[i+1], cards[i+2], cards[i+3]]
-                #[cards[i], cards[i+1], cards[i+2], cards[i+3]]
 
+
+# Returns None! Returns only the highest card
     def check_straight_flush(self, cards=[]):
         """ Checks a list of cards for the best straight flush.
 
-        :param cards:
+        :param cards: List of cards to check in addition of self.
         :return: Returns the highest-ranking card in the flush. If no flush is found it returns None.
         """
         values = []
@@ -452,4 +471,4 @@ class PokerHand(Hand):
                     found_straight = False
                     break
             if found_straight:
-                return card
+                return [card]
