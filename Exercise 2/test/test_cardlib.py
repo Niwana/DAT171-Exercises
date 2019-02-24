@@ -1,14 +1,19 @@
 import cardlib
 
-card = cardlib.NumberedCard
+num_card = cardlib.NumberedCard
+jack_card = cardlib.JackCard
+queen_card = cardlib.QueenCard
+king_card = cardlib.KingCard
+ace_card = cardlib.AceCard
+
 hand = cardlib.Hand()
-# num_card = cardlib.NumberedCard
-# queen_card =
+
+
 suit = cardlib.Suit
 
 
 def test_cards():
-    card_1 = cardlib.NumberedCard(2, cardlib.Suit.clubs)
+    card_1 = num_card(2, cardlib.Suit.clubs)
     assert card_1.get_value() == 2
     assert card_1.get_suit() == 0
 
@@ -30,11 +35,11 @@ def test_cards():
 
 
 def test_comparison_of_cards():
-    card_1 = cardlib.NumberedCard(2, cardlib.Suit.clubs)
-    card_2 = cardlib.NumberedCard(2, cardlib.Suit.clubs)
-    card_3 = cardlib.NumberedCard(3, cardlib.Suit.clubs)
-    card_4 = cardlib.NumberedCard(2, cardlib.Suit.hearts)
-    card_5 = cardlib.NumberedCard(2, cardlib.Suit.hearts)
+    card_1 = num_card(2, cardlib.Suit.clubs)
+    card_2 = num_card(2, cardlib.Suit.clubs)
+    card_3 = num_card(3, cardlib.Suit.clubs)
+    card_4 = num_card(2, cardlib.Suit.hearts)
+    card_5 = num_card(2, cardlib.Suit.hearts)
 
     # Test comparison of values for different cards
     assert card_1 == card_2
@@ -47,9 +52,9 @@ def test_comparison_of_cards():
 
 def test_hand():
     # Test the add_card function
-    hand.add_card(card(5, cardlib.Suit.spades))
-    hand.add_card(card(5, cardlib.Suit.diamonds))
-    hand.add_card(card(7, cardlib.Suit.diamonds))
+    hand.add_card(num_card(5, cardlib.Suit.spades))
+    hand.add_card(num_card(5, cardlib.Suit.diamonds))
+    hand.add_card(num_card(7, cardlib.Suit.diamonds))
     assert len(hand) == 3
 
     # Test the sort function
@@ -75,80 +80,86 @@ def test_deck():
     deck_2.shuffle()
     assert deck_2 != deck_1
 
+    # Test the draw function
+    drawn_cards = deck_1.draw_card(5)
+    assert drawn_cards[0] == num_card(2, suit.clubs) and drawn_cards[4] == num_card(3, suit.clubs)
+    assert len(deck_1) < 52
+    assert drawn_cards[0] not in deck_1
+
 
 def test_high_card():
-    card_1 = card(9, suit.hearts)
-    card_2 = card(7, suit.spades)
+    card_1 = num_card(9, suit.hearts)
+    card_2 = num_card(7, suit.spades)
 
     player_1_cards = cardlib.Hand()
     player_1_cards.add_card(card_1)
     player_1_cards.add_card(card_2)
-    community_cards = [(card(2, suit.hearts)), (card(3, suit.clubs)), (card(4, suit.spades)),
-                       (card(4, suit.diamonds)), (card(5, suit.diamonds))]
+    community_cards = [(num_card(2, suit.hearts)), (num_card(3, suit.clubs)), (num_card(4, suit.spades)),
+                       (num_card(4, suit.diamonds)), (num_card(5, suit.diamonds))]
 
     check = cardlib.PokerHand.check_high_card(player_1_cards, community_cards)
-    assert check == [card(9, suit.hearts)]
+    assert check == [num_card(9, suit.hearts)]
 
 
 def test_one_pair():
-    card_1 = card(5, suit.hearts)
-    card_2 = card(4, suit.spades)
+    card_1 = num_card(5, suit.hearts)
+    card_2 = num_card(4, suit.spades)
 
     player_1_cards = cardlib.Hand()
     player_1_cards.add_card(card_1)
     player_1_cards.add_card(card_2)
-    community_cards = [(card(2, suit.hearts)), (card(2, suit.clubs)), (card(4, suit.spades)),
-                       (card(4, suit.diamonds)), (card(5, suit.diamonds))]
+    community_cards = [(num_card(2, suit.hearts)), (num_card(2, suit.clubs)), (num_card(4, suit.spades)),
+                       (num_card(4, suit.diamonds)), (num_card(5, suit.diamonds))]
 
     check = cardlib.PokerHand.check_one_pair(player_1_cards, community_cards)
-    assert check == [card(5, suit.hearts), card(5, suit.diamonds)]
+    assert check == [num_card(5, suit.hearts), num_card(5, suit.diamonds)]
 
 
 def test_two_pair():
-    card_1 = card(5, suit.hearts)
-    card_2 = card(4, suit.spades)
+    card_1 = num_card(5, suit.hearts)
+    card_2 = num_card(4, suit.spades)
 
     player_1_cards = cardlib.Hand()
     player_1_cards.add_card(card_1)
     player_1_cards.add_card(card_2)
-    community_cards = [(card(2, suit.hearts)), (card(5, suit.clubs)), (card(1, suit.spades)),
-                       (card(4, suit.diamonds)), (card(5, suit.diamonds))]
+    community_cards = [(num_card(2, suit.hearts)), (num_card(5, suit.clubs)), (num_card(1, suit.spades)),
+                       (num_card(4, suit.diamonds)), (num_card(5, suit.diamonds))]
 
     check = cardlib.PokerHand.check_two_pair(player_1_cards, community_cards)
-    assert check == [card(5, suit.hearts), card(5, suit.diamonds), card(4, suit.spades), card(4, suit.diamonds)]
+    assert check == [num_card(5, suit.hearts), num_card(5, suit.diamonds), num_card(4, suit.spades), num_card(4, suit.diamonds)]
 
 
 def test_three_of_a_kind():
-    card_1 = card(7, suit.hearts)
-    card_2 = card(9, suit.spades)
+    card_1 = num_card(7, suit.hearts)
+    card_2 = num_card(9, suit.spades)
 
     player_1_cards = cardlib.Hand()
     player_1_cards.add_card(card_1)
     player_1_cards.add_card(card_2)
-    community_cards = [(card(9, suit.hearts)), (card(3, suit.diamonds)), (card(7, suit.clubs)),
-                       (card(7, suit.diamonds)), (card(2, suit.clubs))]
+    community_cards = [(num_card(9, suit.hearts)), (num_card(3, suit.diamonds)), (num_card(7, suit.clubs)),
+                       (num_card(7, suit.diamonds)), (num_card(2, suit.clubs))]
 
     check = cardlib.PokerHand.check_three_of_a_kind(player_1_cards, community_cards)
-    assert check == [(card(7, suit.hearts)), (card(7, suit.diamonds)), (card(7, suit.clubs))]
+    assert check == [(num_card(7, suit.hearts)), (num_card(7, suit.diamonds)), (num_card(7, suit.clubs))]
 
 
 def test_straight():
-    card_1 = card(6, suit.spades)
-    card_2 = card(7, suit.spades)
+    card_1 = num_card(6, suit.spades)
+    card_2 = num_card(7, suit.spades)
 
     player_1_cards = cardlib.Hand()
     player_1_cards.add_card(card_1)
     player_1_cards.add_card(card_2)
 
-    community_cards = [(card(2, suit.hearts)), (card(3, suit.clubs)), (card(4, suit.spades)),
-                       (card(4, suit.diamonds)), (card(5, suit.diamonds))]
+    community_cards = [(num_card(2, suit.hearts)), (num_card(3, suit.clubs)), (num_card(4, suit.spades)),
+                       (num_card(4, suit.diamonds)), (num_card(5, suit.diamonds))]
     check = cardlib.PokerHand.check_straight(player_1_cards, community_cards)
-    assert check == 7
+    assert check == [num_card(7, suit.spades)]
 
 
 def test_flush():
-    card_1 = card(12, suit.hearts)
-    card_2 = card(7, suit.spades)
+    card_1 = num_card(12, suit.hearts)
+    card_2 = num_card(7, suit.spades)
 
     player_1_cards = cardlib.Hand()
     player_1_cards.add_card(card_1)
@@ -156,70 +167,121 @@ def test_flush():
 
     # Create a large list of community cards resulting in multiple flushes, with
     # 12 of hearts being the highest-ranking card and thus the best flush.
-    community_cards = [(card(2, suit.hearts)), (card(3, suit.hearts)), (card(4, suit.hearts)),
-                       (card(6, suit.hearts)), (card(5, suit.hearts)),
-                       (card(2, suit.spades)), (card(3, suit.spades)), (card(4, suit.spades)),
-                       (card(6, suit.spades)), (card(5, suit.spades))]
+    community_cards = [(num_card(2, suit.hearts)), (num_card(3, suit.hearts)), (num_card(4, suit.hearts)),
+                       (num_card(6, suit.hearts)), (num_card(5, suit.hearts)),
+                       (num_card(2, suit.spades)), (num_card(3, suit.spades)), (num_card(4, suit.spades)),
+                       (num_card(6, suit.spades)), (num_card(5, suit.spades))]
     check = cardlib.PokerHand.check_flush(player_1_cards, community_cards)
     assert check[0] == card_1
 
 
 def test_full_house():
-    card_1 = card(7, suit.hearts)
-    card_2 = card(9, suit.spades)
+    card_1 = num_card(7, suit.hearts)
+    card_2 = num_card(9, suit.spades)
 
     player_1_cards = cardlib.Hand()
     player_1_cards.add_card(card_1)
     player_1_cards.add_card(card_2)
-    community_cards = [(card(9, suit.hearts)), (card(10, suit.spades)), (card(7, suit.clubs)),
-                       (card(10, suit.diamonds)), (card(1, suit.spades)), card(9, suit.clubs)]
+    community_cards = [(num_card(9, suit.hearts)), (num_card(10, suit.spades)), (num_card(7, suit.clubs)),
+                       (num_card(10, suit.diamonds)), (num_card(1, suit.spades)), num_card(9, suit.clubs)]
 
     check = cardlib.PokerHand.check_full_house(player_1_cards, community_cards)
-    assert check == [(card(9, suit.hearts)), (card(9, suit.spades)), (card(9, suit.clubs)), (card(10, suit.spades)), (card(10, suit.diamonds))]
+    assert check == [(num_card(9, suit.hearts)), (num_card(9, suit.spades)), (num_card(9, suit.clubs)), (num_card(10, suit.spades)), (num_card(10, suit.diamonds))]
 
 
 def test_four_of_a_kind():
-    card_1 = card(7, suit.hearts)
-    card_2 = card(9, suit.spades)
+    card_1 = num_card(7, suit.hearts)
+    card_2 = num_card(9, suit.spades)
 
     player_1_cards = cardlib.Hand()
     player_1_cards.add_card(card_1)
     player_1_cards.add_card(card_2)
-    community_cards = [(card(9, suit.hearts)), (card(3, suit.diamonds)), (card(7, suit.clubs)),
-                       (card(7, suit.diamonds)), (card(7, suit.spades))]
+    community_cards = [(num_card(9, suit.hearts)), (num_card(3, suit.diamonds)), (num_card(7, suit.clubs)),
+                       (num_card(7, suit.diamonds)), (num_card(7, suit.spades))]
 
     check = cardlib.PokerHand.check_four_of_a_kind(player_1_cards, community_cards)
-    assert check == [(card(7, suit.hearts)), (card(7, suit.spades)), (card(7, suit.diamonds)), (card(7, suit.clubs))]
+    assert check == [(num_card(7, suit.hearts)), (num_card(7, suit.spades)), (num_card(7, suit.diamonds)), (num_card(7, suit.clubs))]
 
 
 def test_straight_flush():
-    card_1 = card(6, suit.spades)
-    card_2 = card(7, suit.spades)
+    card_1 = num_card(6, suit.spades)
+    card_2 = num_card(7, suit.spades)
 
     player_1_cards = cardlib.Hand()
     player_1_cards.add_card(card_1)
     player_1_cards.add_card(card_2)
 
-    community_cards = [(card(1, suit.spades)), (card(2, suit.spades)), (card(3, suit.spades)),
-                       (card(4, suit.spades)), (card(5, suit.spades))]
+    community_cards = [(num_card(1, suit.spades)), (num_card(2, suit.spades)), (num_card(3, suit.spades)),
+                       (num_card(4, suit.spades)), (num_card(5, suit.spades))]
 
     check = cardlib.PokerHand.check_straight_flush(player_1_cards, community_cards)
-    assert check == [card(7, suit.spades)]
+    assert check == [num_card(7, suit.spades)]
 
 
 def test_best_poker_hand():
     deck_1 = cardlib.StandardDeck()
     deck_1.create_deck()
 
-    card_1 = card(6, suit.spades)
-    card_2 = card(7, suit.hearts)
+    card_1 = num_card(9, suit.spades)
+    card_2 = ace_card(suit.hearts)
 
     player_1_cards = cardlib.Hand()
     player_1_cards.add_card(card_1)
     player_1_cards.add_card(card_2)
-    check_high_card = cardlib.PokerHand.best_poker_hand(player_1_cards)
-#    assert check_high_card == card_2
 
+    # High card
+    community_cards = [(num_card(1, suit.diamonds)), (num_card(8, suit.spades)), (num_card(3, suit.spades)),
+                       (num_card(4, suit.clubs)), (num_card(5, suit.spades))]
+    check_high_card = player_1_cards.best_poker_hand(community_cards)
+    assert check_high_card == [card_2]
 
+    # One pair
+    community_cards = [(num_card(3, suit.diamonds)), (num_card(8, suit.spades)), (num_card(3, suit.spades)),
+                       (num_card(4, suit.clubs)), (num_card(5, suit.spades))]
+    check_one_pair = player_1_cards.best_poker_hand(community_cards)
+    assert check_one_pair == [num_card(3, suit.spades), num_card(3, suit.diamonds)]
 
-#test_best_poker_hand()
+    # Two pairs
+    community_cards = [(num_card(3, suit.diamonds)), (num_card(8, suit.spades)), (num_card(3, suit.spades)),
+                       (num_card(4, suit.clubs)), (ace_card(suit.spades))]
+    check_two_pairs = player_1_cards.best_poker_hand(community_cards)
+    assert check_two_pairs == [ace_card(suit.hearts), ace_card(suit.spades), num_card(3, suit.spades), num_card(3, suit.diamonds)]
+
+    # Three of a kind
+    community_cards = [(num_card(3, suit.diamonds)), (num_card(3, suit.clubs)), (num_card(3, suit.spades)),
+                       (num_card(4, suit.clubs)), (num_card(2, suit.spades))]
+    check_three_of_a_kind = player_1_cards.best_poker_hand(community_cards)
+    assert check_three_of_a_kind == [(num_card(3, suit.spades)), (num_card(3, suit.diamonds)), (num_card(3, suit.clubs))]
+
+    # Straight
+    community_cards = [(num_card(7, suit.diamonds)), (num_card(5, suit.clubs)), (num_card(8, suit.spades)),
+                       (num_card(6, suit.clubs)), (num_card(2, suit.spades))]
+    check_straight = player_1_cards.best_poker_hand(community_cards)
+    assert check_straight == [(num_card(9, suit.spades))]
+
+    # Flush
+    community_cards = [(num_card(3, suit.hearts)), (num_card(3, suit.hearts)), (num_card(3, suit.hearts)),
+                       (num_card(4, suit.hearts)), (num_card(2, suit.spades))]
+    check_flush = player_1_cards.best_poker_hand(community_cards)
+    assert check_flush == [(ace_card(suit.hearts)), (num_card(4, suit.hearts)), (num_card(3, suit.hearts)),
+                                     (num_card(3, suit.hearts)), (num_card(3, suit.hearts))]
+
+    # Full house
+    community_cards = [(ace_card(suit.diamonds)), (num_card(3, suit.clubs)), (num_card(3, suit.spades)),
+                       (num_card(3, suit.clubs)), (num_card(2, suit.spades))]
+    check_full_house = player_1_cards.best_poker_hand(community_cards)
+    assert check_full_house == [(num_card(3, suit.spades)), (num_card(3, suit.clubs)), (num_card(3, suit.clubs)),
+                                     (ace_card(suit.hearts)), (ace_card(suit.diamonds))]
+
+    # Four of a kind
+    community_cards = [(num_card(3, suit.diamonds)), (num_card(3, suit.clubs)), (num_card(3, suit.spades)),
+                       (num_card(3, suit.hearts)), (num_card(2, suit.spades))]
+    check_four_of_a_kind = player_1_cards.best_poker_hand(community_cards)
+    assert check_four_of_a_kind == [(num_card(3, suit.hearts)), (num_card(3, suit.spades)),
+                                    (num_card(3, suit.diamonds)), (num_card(3, suit.clubs))]
+
+    # Straight flush
+    community_cards = [(king_card(suit.hearts)), (jack_card(suit.hearts)), (queen_card(suit.hearts)),
+                       (num_card(10, suit.hearts)), (num_card(2, suit.spades))]
+    check_straight_flush = player_1_cards.best_poker_hand(community_cards)
+    assert check_straight_flush == [(ace_card(suit.hearts))]
