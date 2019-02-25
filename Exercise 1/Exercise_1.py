@@ -4,12 +4,12 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection as lC
 from scipy.sparse import csgraph, csr_matrix as csr
 from scipy.spatial import cKDTree as cKD
-
+import math
 
 R = 1
 
 
-def mercator_projection(latitude: [float], longitude: [float]) -> [float]:
+def mercator_projection(latitude: float, longitude: float) -> tuple((float, float)):
     """
     Mercator projection of a given geographical point (latitude, longitude).
 
@@ -22,8 +22,8 @@ def mercator_projection(latitude: [float], longitude: [float]) -> [float]:
     :return x: Cylindrical x projection
     :return y: Cylindrical y projection
     """
-    x = (R * (np.pi * float(longitude)) / 180)
-    y = (R * np.log(np.tan((np.pi / 4) + ((np.pi * float(latitude)) / 360))))
+    x = (R * (np.pi * longitude) / 180)
+    y = (R * np.log(np.tan((np.pi / 4) + ((np.pi * latitude) / 360))))
     return x, y
 
 
@@ -71,7 +71,7 @@ def construct_graph_connections(coords, radius):
     for i, city_i in enumerate(coords):
         for j in range(i + 1, len(coords)):
             city_j = coords[j]
-            distance = np.linalg.norm(city_i - city_j)
+            distance = math.sqrt(((city_i[0] - city_j[0]) ** 2) + (city_i[1] - city_j[1]) ** 2)
             if distance < radius:
                 distances.append(distance)
                 indices.append((i, j))
@@ -91,7 +91,8 @@ def construct_fast_graph_connections(coords, radius):
         new_neighbours = [k for k in filtered_city if k > i]
         for j in range(0, len(new_neighbours)):
             indices.append((i, new_neighbours[j]))
-            distances.append(np.linalg.norm(coords[i] - coords[new_neighbours[j]]))
+            distances.append(math.sqrt(((coords[i][0] - coords[new_neighbours[j]][0]) ** 2) +
+                                       (coords[i][1] - coords[new_neighbours[j]][1]) ** 2))
     costs = np.array(distances) ** (9 / 10)
     return np.array(indices), costs
 
@@ -100,15 +101,25 @@ def construct_fast_graph_connections(coords, radius):
 # Creates a compressed sparse row matrix of the travel costs associated with each
 # node connection.
 def construct_graph(indices, costs, N):
-    s_graph = (csr((costs, (indices[:, 0], indices[:, 1])), shape=(N, N)))
+    #FRÅGA
+    s_graph = csr((costs, (indices[:, 0], indices[:, 1])), shape=(N, N))  # N is the size of the sparse graph
     return s_graph
 
 
 # --------------------------------------------------------------------------------
 # Finds the cheapest path through a sparse graph utilizing the Dijkstra algorithm.
 def cheapest_path(s_graph, start, end):
-    cost_matrix, predecessors = csgraph.dijkstra(s_graph, directed=False, indices=start,
-                                                 return_predecessors=True)
+    """
+    Dijkstra calculates the shortest path between nodes
+
+    :param s_graph: includes the costs between the nodes which are in close distance to each other.
+    :param start: start node
+    :param end: end node
+    :return: a cost matrix which consists of the shortest path from start node to end node.
+            predecessors is a list of all the nodes which are
+    """
+    cost_matrix, predecessors = csgraph.dijkstra(s_graph, directed=False, indices=start, return_predecessors=True)
+    print(predecessors)
     return cost_matrix[end], predecessors
 
 
@@ -144,14 +155,12 @@ search_radius = 0.0025
 coord_list = read_coordinate_file('GermanyCities.txt')
 time_read_coord = t.time()
 
-
 # ------------------------------------------------------------------
 # Determine intercity-connections using a manual method or a kd-tree
 start2_time = t.time()
 # city_indices, travel_costs = construct_graph_connections(coord_list, search_radius)
 city_indices, travel_costs = construct_fast_graph_connections(coord_list, search_radius)
 time_construct_graph_connections = t.time()
-
 
 # -------------------------------------------------------------------
 # Find and draw the cheapest path between the start node and end node
