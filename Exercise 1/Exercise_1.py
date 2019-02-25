@@ -7,17 +7,21 @@ from scipy.spatial import cKDTree as cKD
 import math
 
 R = 1
+start_node = 1573
+end_node = 10584
+search_radius = 0.0025
+country = 'GermanyCities.txt'
+
+time_read_coord = t.time()
+start_time = t.time()
 
 
 def mercator_projection(latitude: float, longitude: float) -> tuple((float, float)):
     """
     Mercator projection of a given geographical point (latitude, longitude).
-
-
     Parameters:
     :param longitude: Geographical coordinate of a north-south position
     :param latitude: Geographical coordinate of an east-west position
-
     Returns:
     :return x: Cylindrical x projection
     :return y: Cylindrical y projection
@@ -27,9 +31,12 @@ def mercator_projection(latitude: float, longitude: float) -> tuple((float, floa
     return x, y
 
 
-# ------------------------------------------------------
-# Read coordinates from file and store them in an array.
 def read_coordinate_file(filename):
+    """  Read coordinates from file and store them in an array.
+
+    :param filename:
+    :return:
+    """
     coords = []
     with open(filename, 'r') as file:
         for line in file:
@@ -42,14 +49,19 @@ def read_coordinate_file(filename):
     return np.array(coords)
 
 
-# -------------------------------------------------------------------------
-# Plot all points, connections and the cheapest path from the start node to
-# the end node.
 def plot_points(coords, indices, path):
-    time_plot = t.time()
+    """ Plot all points, connections and the cheapest path from the start node to
+    the end node.
 
-    # creates a line collection of the nodes within a given radius and a
-    # separate line collection of the cheapest path
+    Creates a line collection of the nodes within a given radius and a
+    separate line collection of the cheapest path.
+
+    :param coords:
+    :param indices:
+    :param path:
+    :return:
+    """
+    time_plot = t.time()
     radius_segments = lC(coords[indices], color='gray', linewidths=0.2)
     path_segment = lC(coords[np.array(path)], color='blue', linewidths=2)
     plt.scatter(coords[:, 0], coords[:, 1], color='r', s=10)
@@ -62,10 +74,14 @@ def plot_points(coords, indices, path):
     plt.show()
 
 
-# ---------------------------------------------------------------------------
-# Determines neighbouring nodes for each node, and calculates the travel cost
-# if within a given radius.
 def construct_graph_connections(coords, radius):
+    """ Determines neighbouring nodes for each node, and calculates the travel cost
+    if within a given radius.
+
+    :param coords:
+    :param radius:
+    :return:
+    """
     indices = []
     distances = []
     for i, city_i in enumerate(coords):
@@ -79,10 +95,13 @@ def construct_graph_connections(coords, radius):
     return np.array(indices), costs
 
 
-# ---------------------------------------------------------------------------
-# Determines neighbouring nodes for each node, and calculates the travel cost
-# if within a given radius.
 def construct_fast_graph_connections(coords, radius):
+    """ Determines neighbouring nodes for each node, and calculates the travel cost
+    if within a given radius.
+    :param coords:
+    :param radius:
+    :return:
+    """
     tree = cKD(coords)
     indices = []
     distances = []
@@ -97,12 +116,16 @@ def construct_fast_graph_connections(coords, radius):
     return np.array(indices), costs
 
 
-# -------------------------------------------------------------------------------
-# Creates a compressed sparse row matrix of the travel costs associated with each
-# node connection.
 def construct_graph(indices, costs, N):
-    #FRÅGA
-    s_graph = csr((costs, (indices[:, 0], indices[:, 1])), shape=(N, N))  # N is the size of the sparse graph
+    """ Creates a compressed sparse row matrix of the travel costs associated with each
+    node connection.
+
+    :param indices:
+    :param costs:
+    :param N:
+    :return:
+    """
+    s_graph = csr((costs, (indices[:,0], indices[:,1])), shape=(N, N))  # N is the size of the sparse graph
     return s_graph
 
 
@@ -111,7 +134,6 @@ def construct_graph(indices, costs, N):
 def cheapest_path(s_graph, start, end):
     """
     Dijkstra calculates the shortest path between nodes
-
     :param s_graph: includes the costs between the nodes which are in close distance to each other.
     :param start: start node
     :param end: end node
@@ -123,9 +145,15 @@ def cheapest_path(s_graph, start, end):
     return cost_matrix[end], predecessors
 
 
-# ------------------------------------------------------------
-# Converts a node predecessor matrix into a sequence of nodes.
 def compute_path(predecessors, start, end):
+    """
+    Converts a node predecessor matrix into a sequence of nodes.
+
+    :param predecessors:
+    :param start:
+    :param end:
+    :return:
+    """
     path = []
     current = end
     while current != start:
@@ -148,12 +176,7 @@ def path_to_array(path):
 
 # ------------------------
 # User input and main code
-start_time = t.time()
-start_node = 1573
-end_node = 10584
-search_radius = 0.0025
-coord_list = read_coordinate_file('GermanyCities.txt')
-time_read_coord = t.time()
+coord_list = read_coordinate_file(country)
 
 # ------------------------------------------------------------------
 # Determine intercity-connections using a manual method or a kd-tree
