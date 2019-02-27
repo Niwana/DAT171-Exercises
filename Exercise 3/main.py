@@ -8,6 +8,7 @@ qt_app = QApplication(sys.argv)
 
 
 class OtherPlayer(QGroupBox):
+    """ The inactive player """
     def __init__(self):
         super().__init__("Other player")
 
@@ -25,12 +26,24 @@ class OtherPlayer(QGroupBox):
         player_name.setAlignment(Qt.AlignCenter)
 
         card1 = QLabel(self)
-        card1.setPixmap(QPixmap('cards\\Red_Back_2.svg'))
+        card1_pixmap = QPixmap('cards\\Red_Back_2.svg')
+        smaller_card1 = card1_pixmap.scaled(200, 200, Qt.KeepAspectRatio, Qt.FastTransformation)
+        card1.setPixmap(smaller_card1)
         card1.setAlignment(Qt.AlignCenter)
 
         card2 = QLabel(self)
-        card2.setPixmap(QPixmap('cards\\Red_Back_2.svg'))
+        card2_pixmap = QPixmap('cards\\Red_Back_2.svg')
+        smaller_card2 = card2_pixmap.scaled(200, 200, Qt.KeepAspectRatio, Qt.FastTransformation)
+        card2.setPixmap(smaller_card2)
         card2.setAlignment(Qt.AlignCenter)
+
+        # TODO: Här används en annnan metod
+        card3 = QLabel(self)
+        card3_pixmap = QPixmap('cards\\Red_Back_2.svg')
+        #smaller_card1 = card1_pixmap.scaled(200, 200, Qt.KeepAspectRatio, Qt.FastTransformation)
+        smaller_card3 = QPixmap.scaledToHeight(card3_pixmap, 200)
+        card3.setPixmap(smaller_card3)
+        card3.setAlignment(Qt.AlignCenter)
 
         empty = QLabel(self)
 
@@ -38,6 +51,7 @@ class OtherPlayer(QGroupBox):
         hbox.addWidget(empty)
         hbox.addWidget(card1)
         hbox.addWidget(card2)
+        hbox.addWidget(card3)
         hbox.addWidget(remaining)
 
         hbox_player = QHBoxLayout()
@@ -51,6 +65,7 @@ class OtherPlayer(QGroupBox):
 
 
 class CommunityCards(QGroupBox):
+    """ Community cards """
     def __init__(self):
         super().__init__("Community cards")
         card1 = QLabel(self)
@@ -72,13 +87,17 @@ class CommunityCards(QGroupBox):
         card5 = QLabel(self)
         card5.setPixmap(QPixmap('cards\\6C.svg'))
         card5.setAlignment(Qt.AlignCenter)
+        QPixmap()
 
         hbox = QHBoxLayout()
+        #hbox.addStretch()
         hbox.addWidget(card1)
         hbox.addWidget(card2)
         hbox.addWidget(card3)
         hbox.addWidget(card4)
         hbox.addWidget(card5)
+        #hbox.addStretch()
+
 
         vbox = QVBoxLayout()
 
@@ -94,6 +113,7 @@ class CommunityCards(QGroupBox):
         hbox2 = QHBoxLayout()
         hbox2.addWidget(pot)
 
+
         vbox.addLayout(hbox)
         vbox.addLayout(hbox2)
 
@@ -101,6 +121,7 @@ class CommunityCards(QGroupBox):
 
 
 class ActivePlayer(QGroupBox):
+    """ Active player """
     def __init__(self):
         super().__init__("Active player")
         font = QFont()
@@ -118,25 +139,24 @@ class ActivePlayer(QGroupBox):
 
         card1 = QLabel(self)
         card1.setPixmap(QPixmap('cards\\KC.svg'))
-        card1.setAlignment(Qt.AlignCenter)
+        card1.setAlignment(Qt.AlignLeft)
 
         card2 = QLabel(self)
         card2.setPixmap(QPixmap('cards\\JS.svg'))
-        card2.setAlignment(Qt.AlignCenter)
-
+        card2.setAlignment(Qt.AlignRight)
 
 
         # Buttons
         call_button = QPushButton('Call')
-        call_button.setFixedWidth(100)
+        #call_button.setFixedWidth(100)
         raise_button_field = QLineEdit()
-        raise_button_field.setFixedWidth(100)
+        #raise_button_field.setFixedWidth(100)
 
         raise_button = QPushButton('Raise')
-        raise_button.setFixedWidth(100)
+        #raise_button.setFixedWidth(100)
 
         fold_button = QPushButton('Fold')
-        fold_button.setFixedWidth(100)
+        #fold_button.setFixedWidth(100)
         hbox_raise = QHBoxLayout()
 
         hbox_raise.addWidget(raise_button_field)
@@ -156,10 +176,13 @@ class ActivePlayer(QGroupBox):
         hbox_remaining = QHBoxLayout()
         hbox_remaining.addWidget(remaining)
 
+        hbox.addStretch()
         hbox.addLayout(vbox_buttons)
+        hbox.addStretch()
         hbox.addLayout(hbox_cards)
+        hbox.addStretch()
         hbox.addLayout(hbox_remaining)
-
+        hbox.addStretch()
 
         hbox_player = QHBoxLayout()
         hbox_player.addWidget(player_name)
@@ -172,168 +195,20 @@ class ActivePlayer(QGroupBox):
 
 
 class Window(QGroupBox):
+    """ main window """
     def __init__(self):
         super().__init__("main window")
-        w = QWidget()
+        # w = QWidget()
         vbox = QVBoxLayout()
         vbox.addWidget(OtherPlayer())
         vbox.addWidget(CommunityCards())
         vbox.addWidget(ActivePlayer())
 
         self.setLayout(vbox)
-        self.setGeometry(300, 300, 1000, 600)
+        #self.setGeometry(300, 300, 1000, 600)
         self.setWindowTitle("Texas Hold Em'")
 
 
 win = Window()
 win.show()
 qt_app.exec_()
-
-
-"""
-def window2():
-    app = QApplication(sys.argv)
-
-    w = QWidget()
-    top = QLabel(w)
-    top.setText('Top')
-    top.setAlignment(Qt.AlignCenter)
-
-    callButton = QPushButton('Call')
-
-    middle = QLabel(w)
-    middle.setText('Middle')
-    middle.setAlignment(Qt.AlignCenter)
-
-    bottom = QLabel(w)
-    bottom.setText('Bottom')
-    bottom.setAlignment(Qt.AlignCenter)
-
-    vbox = QVBoxLayout()
-    vbox.addWidget(top)
-    vbox.addWidget(middle)
-    vbox.addWidget(bottom)
-    #vbox.addStretch()
-
-    hbox = QVBoxLayout(middle)
-    #vbox2 = QVBoxLayout()
-    vbox.addWidget(callButton)
-
-    #label_mid_p1 = QLabel()
-    #label_mid_p1.setAlignment(Qt.AlignCenter)
-    #label_mid_p2 = QLabel()
-    #label_mid_p2.setAlignment(Qt.AlignCenter)
-
-    # label_mid_p3 = QtWidgets.QLabel(middle)
-    # label_mid_p4 = QtWidgets.QLabel(middle)
-    # label_mid_p5 = QtWidgets.QLabel(middle)
-
-    #label_mid_p1.setPixmap(QPixmap('kort.png'))
-    #label_mid_p2.setPixmap(QPixmap('kort.png'))
-    # label_mid_p3.setPixmap(QtGui.QPixmap('kort.png'))
-    # label_mid_p4.setPixmap(QtGui.QPixmap('kort.png'))
-    # label_mid_p5.setPixmap(QtGui.QPixmap('kort.png'))
-
-    #vbox2.addWidget(label_mid_p1)
-    #vbox2.addWidget(label_mid_p2)
-
-
-
-
-    #hbox.addWidget(label_mid_p1)
-    #hbox.addWidget(label_mid_p2)
-
-    #shbox.addLayout(vbox2)
-
-    #hbox.addWidget(label_mid_p3)
-    #hbox.addWidget(label_mid_p4)
-    #hbox.addWidget(label_mid_p5)
-
-
-
-    w.setLayout(vbox)
-    w.setWindowTitle("Texas Hold Em'")
-
-    w.show()
-    sys.exit(app.exec_())
-    # sys.exc_info(app.exec_())
-
-window()
-
-    #app = QtWidgets.QApplication(sys.argv)
-
-    w = QtWidgets.QWidget()
-    label_player_2 = QtWidgets.QLabel(w)
-    label_player_3 = QtWidgets.QLabel(w)
-
-    label_player_2.setText("player 2")
-    label_player_1.setText("Player 1")
-    label_player_3.setText("Player 3")
-
-    h_box = QtWidgets.QHBoxLayout()
-    h_box.addStretch()
-    w.setWindowTitle("test")
-    w.setGeometry(100,100,400,400)
-
-
-    h_box = QtWidgets.QHBoxLayout()
-    h_box.addWidget(label_player_2)
-    h_box.addLayout(h_box)
-
-    v_box2 = QtWidgets.QVBoxLayout()
-    v_box2.addWidget(label_player_1)
-    v_box2.addLayout(h_box)
-    w.setLayout(h_box)
-
-    #w.setBackgroundRole()
-
-    #label1.move(100,20)
-    #label2.move(200,40)
-
-    w.setWindowTitle("Texas Hold Em'")
-
-
-    w.show()
-    sys.exit(app.exec_())
-    #sys.exc_info(app.exec_())
-
-
-    label_mid_p1 = QtWidgets.QLabel(w)
-    label_mid_p2 = QtWidgets.QLabel(w)
-    label_mid_p3 = QtWidgets.QLabel(w)
-    label_mid_p4 = QtWidgets.QLabel(w)
-    label_mid_p5 = QtWidgets.QLabel(w)
-
-    label_mid_p1.setPixmap(QtGui.QPixmap('pika.jpg'))
-    label_mid_p2.setPixmap(QtGui.QPixmap('pika.jpg'))
-    label_mid_p3.setPixmap(QtGui.QPixmap('pika.jpg'))
-    label_mid_p4.setPixmap(QtGui.QPixmap('pika.jpg'))
-    label_mid_p5.setPixmap(QtGui.QPixmap('pika.jpg'))
-
-    h_box.addWidget(label_mid_p1)
-    h_box.addWidget(label_mid_p2)
-    h_box.addWidget(label_mid_p3)
-    h_box.addWidget(label_mid_p4)
-    h_box.addWidget(label_mid_p5)
-
-    h_box.addStretch()
-"""
-"""
-card1 = QLabel(self)
-        card1.setPixmap(QPixmap('cards\\2C.svg'))
-        card1.setAlignment(Qt.AlignLeft)
-
-        card2 = QLabel(self)
-        card2.setPixmap(QPixmap('cards\\3C.svg'))
-        #card2.setMargin(100)
-        card2.setAlignment(Qt.AlignRight)
-
-        vbox = QHBoxLayout()
-        vbox.addStretch(1)
-        #hbox.addWidget(card1)
-        #hbox.addWidget(card2)
-        vbox.addWidget(card1)
-        vbox.addWidget(card2)
-
-"""
-
