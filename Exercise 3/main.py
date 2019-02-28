@@ -5,6 +5,13 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 qt_app = QApplication(sys.argv)
+# TODO: lägg till bet, check, call?
+
+# Låt vinsten vara en funktion med potten som input. Kom ihåg att lägga till signals.
+# g.player[0].win_money(pot)
+# Använd ej följande:
+# g.player[0].money += pot
+
 
 
 class OtherPlayer(QGroupBox):
@@ -37,6 +44,8 @@ class OtherPlayer(QGroupBox):
         card2.setPixmap(smaller_card2)
         card2.setAlignment(Qt.AlignCenter)
 
+
+        """
         # TODO: Här används en annnan metod
         card3 = QLabel(self)
         card3_pixmap = QPixmap('cards\\Red_Back_2.svg')
@@ -44,6 +53,7 @@ class OtherPlayer(QGroupBox):
         smaller_card3 = QPixmap.scaledToHeight(card3_pixmap, 200)
         card3.setPixmap(smaller_card3)
         card3.setAlignment(Qt.AlignCenter)
+        """
 
         empty = QLabel(self)
 
@@ -51,7 +61,7 @@ class OtherPlayer(QGroupBox):
         hbox.addWidget(empty)
         hbox.addWidget(card1)
         hbox.addWidget(card2)
-        hbox.addWidget(card3)
+        # hbox.addWidget(card3)
         hbox.addWidget(remaining)
 
         hbox_player = QHBoxLayout()
@@ -120,6 +130,34 @@ class CommunityCards(QGroupBox):
         self.setLayout(vbox)
 
 
+class InputBoxLayout(QGroupBox):
+    """ Input box with buttons for call, fold and raise. """
+    def __init__(self):
+        super().__init__("Input box")
+
+        # Buttons
+        call_button = QPushButton('Call')
+        # call_button.setFixedWidth(100)
+        raise_button_field = QLineEdit()
+        # raise_button_field.setFixedWidth(100)
+
+        raise_button = QPushButton('Raise')
+        # raise_button.setFixedWidth(100)
+
+        fold_button = QPushButton('Fold')
+        # fold_button.setFixedWidth(100)
+        hbox_raise = QHBoxLayout()
+
+        hbox_raise.addWidget(raise_button_field)
+        hbox_raise.addWidget(raise_button)
+
+        vbox_buttons = QVBoxLayout()
+        vbox_buttons.addWidget(call_button)
+        vbox_buttons.addLayout(hbox_raise)
+        vbox_buttons.addWidget(fold_button)
+
+        self.setLayout(vbox_buttons)
+
 class ActivePlayer(QGroupBox):
     """ Active player """
     def __init__(self):
@@ -145,7 +183,7 @@ class ActivePlayer(QGroupBox):
         card2.setPixmap(QPixmap('cards\\JS.svg'))
         card2.setAlignment(Qt.AlignRight)
 
-
+        """
         # Buttons
         call_button = QPushButton('Call')
         #call_button.setFixedWidth(100)
@@ -166,23 +204,26 @@ class ActivePlayer(QGroupBox):
         vbox_buttons.addWidget(call_button)
         vbox_buttons.addLayout(hbox_raise)
         vbox_buttons.addWidget(fold_button)
-
+        """
         hbox = QHBoxLayout()
+        empty = QLabel(self)
 
         hbox_cards = QHBoxLayout()
+
         hbox_cards.addWidget(card1)
         hbox_cards.addWidget(card2)
 
         hbox_remaining = QHBoxLayout()
         hbox_remaining.addWidget(remaining)
 
-        hbox.addStretch()
-        hbox.addLayout(vbox_buttons)
-        hbox.addStretch()
+        #hbox.addStretch()
+        #hbox.addLayout(vbox_buttons)
+        #hbox.addStretch()
+        hbox.addWidget(empty)
         hbox.addLayout(hbox_cards)
-        hbox.addStretch()
+        #hbox.addStretch()
         hbox.addLayout(hbox_remaining)
-        hbox.addStretch()
+        #hbox.addStretch()
 
         hbox_player = QHBoxLayout()
         hbox_player.addWidget(player_name)
@@ -203,10 +244,11 @@ class Window(QGroupBox):
         vbox.addWidget(OtherPlayer())
         vbox.addWidget(CommunityCards())
         vbox.addWidget(ActivePlayer())
+        vbox.addWidget(InputBoxLayout())
 
         self.setLayout(vbox)
         #self.setGeometry(300, 300, 1000, 600)
-        self.setWindowTitle("Texas Hold Em'")
+        self.setWindowTitle("Texas Hold'em")
 
 
 win = Window()
