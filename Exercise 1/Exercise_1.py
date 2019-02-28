@@ -15,6 +15,7 @@ country = 'GermanyCities.txt'
 
 time_read_coord = t.time()
 
+# TODO: kommentera utförligare
 
 def mercator_projection(latitude: float, longitude: float) -> tuple((float, float)):
     """
@@ -62,14 +63,14 @@ def plot_points(coords, indices, path):
     :return:
     """
     time_plot = t.time()
+    path_to_tuples = []
+    for cities in coords[path]:
+        path_to_tuples.append(tuple(cities))
 
-    new = []
-    for i in coord_list[path]:
-        new.append(tuple(i))
     # creates a line collection of the nodes within a given radius and a
     # separate line collection of the cheapest path
     radius_segments = lC(coords[indices], color='gray', linewidths=0.2)
-    path_segment = lC([new], color='blue', linewidths=2)
+    path_segment = lC([path_to_tuples], color='blue', linewidths=2)
     plt.scatter(coords[:, 0], coords[:, 1], color='r', s=10)
 
     ax = plt.gca()
@@ -90,10 +91,9 @@ def construct_graph_connections(coords, radius):
     """
     indices = []
     distances = []
-    for i, city_i in enumerate(coords):
-        for j in range(i + 1, len(coords)):
-            city_j = coords[j]
-            distance = math.sqrt(((city_i[0] - city_j[0]) ** 2) + (city_i[1] - city_j[1]) ** 2)
+    for i, current_city in enumerate(coords):
+        for j, other_city in enumerate(coords[i+1:]):
+            distance = math.sqrt(((current_city[0] - other_city[0]) ** 2) + (current_city[1] - other_city[1]) ** 2)
             if distance < radius:
                 distances.append(distance)
                 indices.append((i, j))
@@ -152,6 +152,7 @@ def cheapest_path(s_graph, start, end):
 
 
 def compute_path(predecessors, start, end):
+    # TODO: kommentera reverse, ordningen
     """ Converts a node predecessor matrix into a sequence of nodes.
 
     :param predecessors:
@@ -169,20 +170,6 @@ def compute_path(predecessors, start, end):
     return path
 
 
-def path_to_array(path):
-    """ Takes the indices from chosen path and groups them into pairs of node indices,
-        which lineCollection can use to print the cheapest path.
-
-    :param path:
-    :return:
-    """
-    path_indices = []
-    print('path: ',path)
-    for i in range(len(path) - 1):
-        path_indices.append([path[i], path[i + 1]])
-    print('path indices', path_indices)
-    return path_indices
-
 
 coord_list = read_coordinate_file(country)
 # ------------------------------------------------------------------
@@ -198,7 +185,7 @@ start3_time = t.time()
 sparse_graph = construct_graph(city_indices, travel_costs, len(coord_list))
 path_cost, predecessor_matrix = cheapest_path(sparse_graph, start_node, end_node)
 chosen_path = compute_path(predecessor_matrix, start_node, end_node)
-chosen_path_indices = path_to_array(chosen_path)
+
 time_calc_shortest_path = t.time()
 
 print(f'\nThe cheapest path between city {start_node} and city {end_node} costs: {path_cost}\n'
