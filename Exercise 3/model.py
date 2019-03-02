@@ -1,11 +1,21 @@
-import cardlib
-
+from cardlib import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import sys
 
 
+# TODO: konstruera en välkomstruta där man anger spelarnas namn, startpengar och big blinds värde?
+#  När rutan stängs (ok-knapp?) startar spelet.
+
+# TODO: Implementera check: "Att checka (eller passa) betyder att man väljer att inte satsa något nu, men ändå vill
+#  stanna kvar i given tillsvidare. Man kan checka så länge ingen annan öppnat."
+
+#  TODO: Läs på om nedanstående. Vi har
+#   inga separata pottar: "Att syna (engelska call) innebär att man går med på att betala så att ens pott innehåller
+#   samma belopp som den som öppnade eller höjde. Om spelaren A till höger B till exempel öppnade med 2 kr så måste B
+#   lägga 2 kr i sin egen pott för att syna. Observera än en gång att allt satsande sker i separata potter. Den stora
+#   potten i mitten är bara uppsamlingsplats för de marker som satsats i de enskilda satsningsrundorna." ~ wikipedia
 
 class TexasHoldEm(QObject):
     new_credits = pyqtSignal()
@@ -16,20 +26,79 @@ class TexasHoldEm(QObject):
         self.players = ['Name 1', 'Name 2']
         self.credits = [1000, 1000]
         self.pot = 0
+        self.active_player = 0
+        self.round_counter = 0
+        self.big_blind = 10
+        self.previous_bet = 0
 
     def call(self):
+        """ Måste satsa lika mycket som den spelare som satsat mest."""
+        if self.credit(self.active_player) >= self.previous_bet and not self.previous_bet == 0:
+            self.pot += self.previous_bet
+            self.credits[self.active_player] -= self.previous_bet
+        else:
+            print('Otillåten handling eller fel i call-funktionen')
+
+    def flop(self):
+        # TODO: Dela ut tre community cards på en gång. Efter det ett i taget tills fem stycken ligger på bordet.
+        #   "In the third and fourth betting rounds, the stakes double." (???????)
         pass
 
     def bet(self, amount):
-        self.pot += amount
-        self.credits[0] -= amount
-        #self.new_pot.emit()
-        self.new_credits.emit()
-        print("Credits:", self.credits)
-        print("Pot", self.pot)
+        # TODO: Besluta om vi ska köra no-limit texas holdem, limit eller pot-limit.
+        # TODO: Visa big blinds värde på skärmen.
+        # TODO: Byt från print() till dialogrutor vid varningar. box = QMessageBox(), box.setText(), box.exec__()
+        # TODO: Hur hantera all-in?
+
+        if self.previous_bet == 0 and amount < self.big_blind:
+            print("Bet must be equal to or higher than the big blind!")
+        elif amount < self.previous_bet:
+            print("Bet must be equal to or higher than the previous raise")
+        elif amount <= self.credits[self.active_player]:
+            self.pot += amount
+            self.credits[self.active_player] -= amount
+            self.previous_bet = amount + self.big_blind
+            # self.new_pot.emit()
+            self.new_credits.emit()
+            # Swap the active player
+            self.active_player = 1 - self.active_player
+
+            print("Credits:", self.credits)
+            print("Pot", self.pot)
+            print("Previous bet", self.previous_bet)
+        else:
+            print("Not enough money!")
 
     def fold(self):
-        pass
+        """ Då vinner automatiskt motståndaren? """
+        # TODO: Avsluta spelet på något vis? Starta om?
+        self.credits[1 - self.active_player] += self.pot    # Ger motståndaren hela potten.
+        self.pot = 0
+
+    def showdown(self):
+        """
+        # TODO: Modifiera best_poker_hand så att även typ av hand returneras, inte bara det högsta kortet?
+        # TODO: Implementera en metod som vänder/visar alla kort
+
+        best_hand_player_0 = PokerHand.best_poker_hand(community_cards + player_0_hand) # hur göra detta?
+        best_hand_player_1 = PokerHand.best_poker_hand(community_cards + player_0_hand)
+
+        if best_hand_player_0 > best_hand_player_1:
+            print("Player 0 won!")
+            self.credits[0] += self.pot
+
+        if best_hand_player_0 < best_hand_player_1:
+            print("Player 1 won!")
+            self.credits[1] += self.pot
+
+        if best_hand_player_0 == best_hand_player_1
+            # fördela potten jämnt om det är identiska vinnande händer
+            print("Oavgjort")
+            self.credits[0] += (self.pot / 2)
+            self.credits[1] += (self.pot / 2)
+        else:
+            print(" Fel vid jämförelsen?")
+        """
 
 
 class Player:
@@ -53,9 +122,13 @@ class CommunityCards(QObject):
         self.new_card.emit()
 
 
-class buttons():
+class Buttons:
     def __init__(self):
         super().__init__()
 
     def print_click(self):
         print('klick')
+        #print(TexasHoldEm.pot_func())
+
+    def print_fold(self):
+        print('fold')
