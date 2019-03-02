@@ -34,6 +34,8 @@ import sys
 # TODO: Efter att en spelare har raisat måste den andra spelaren ta ett beslut. Det läggs inga fler kort på bordet
 #  innan det är gjort.
 
+# TODO: Visa blinds värde på skärmen.
+
 
 class TexasHoldEm(QObject):
     new_credits = pyqtSignal()
@@ -46,7 +48,7 @@ class TexasHoldEm(QObject):
         self.pot = 0
         self.active_player = 0
         self.round_counter = 0
-        self.blind = self.credits[0]/100
+        self.blind = self.credits[0]//100
         self.previous_bet = 0
 
         print("Blind:", self.blind)
@@ -66,7 +68,7 @@ class TexasHoldEm(QObject):
         self.active_player = 1 - self.active_player
 
     def allin(self):
-        # TODO: när någon gör all in måste den andra spelaren folda eller också göra all in
+        """ När någon gör all in måste den andra spelaren folda eller också göra all in """
         self.pot += self.credit(self.active_player)
         self.credit[self.active_player] = 0
 
@@ -77,14 +79,14 @@ class TexasHoldEm(QObject):
 
     def bet(self, amount):
         # TODO: Besluta om vi ska köra no-limit texas holdem, limit eller pot-limit.
-        # TODO: Visa blinds värde på skärmen.
         # TODO: Byt från print() till dialogrutor vid varningar. box = QMessageBox(), box.setText(), box.exec__()
         # TODO: Hur hantera all-in?
 
         if self.previous_bet == 0 and amount < self.blind:
             print("Bet must be equal to or higher than the blind!")
         elif amount + self.blind < self.previous_bet:
-            print("Bet must be equal to or higher than the previous raise")
+            print("Bet must be equal to or higher than the previous raise.\n"
+            "You tried raising {} + {} (blind) for a total bet of {}.".format(amount, self.blind, amount+self.blind))
         elif amount + self.blind <= self.credits[self.active_player]:
             self.pot += amount + self.blind
             self.credits[self.active_player] -= amount
