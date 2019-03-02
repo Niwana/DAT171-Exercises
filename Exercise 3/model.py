@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import *
 import sys
 
 
-# TODO: konstruera en välkomstruta där man anger spelarnas namn, startpengar och big blinds värde?
+# TODO: konstruera en välkomstruta där man anger spelarnas namn, startpengar och (big blind?) blinds värde?
 #  När rutan stängs (ok-knapp?) startar spelet.
 
 # TODO: Implementera check: "Att checka (eller passa) betyder att man väljer att inte satsa något nu, men ändå vill
@@ -28,14 +28,17 @@ class TexasHoldEm(QObject):
         self.pot = 0
         self.active_player = 0
         self.round_counter = 0
-        self.big_blind = 10
+        self.blind = 10
         self.previous_bet = 0
+
+        print("Blind:", self.blind)
 
     def call(self):
         """ Måste satsa lika mycket som den spelare som satsat mest."""
         if self.credit(self.active_player) >= self.previous_bet and not self.previous_bet == 0:
             self.pot += self.previous_bet
             self.credits[self.active_player] -= self.previous_bet
+            print("Call")
         else:
             print('Otillåten handling eller fel i call-funktionen')
 
@@ -46,18 +49,18 @@ class TexasHoldEm(QObject):
 
     def bet(self, amount):
         # TODO: Besluta om vi ska köra no-limit texas holdem, limit eller pot-limit.
-        # TODO: Visa big blinds värde på skärmen.
+        # TODO: Visa blinds värde på skärmen.
         # TODO: Byt från print() till dialogrutor vid varningar. box = QMessageBox(), box.setText(), box.exec__()
         # TODO: Hur hantera all-in?
 
-        if self.previous_bet == 0 and amount < self.big_blind:
-            print("Bet must be equal to or higher than the big blind!")
+        if self.previous_bet == 0 and amount < self.blind:
+            print("Bet must be equal to or higher than the blind!")
         elif amount < self.previous_bet:
             print("Bet must be equal to or higher than the previous raise")
         elif amount <= self.credits[self.active_player]:
             self.pot += amount
             self.credits[self.active_player] -= amount
-            self.previous_bet = amount + self.big_blind
+            self.previous_bet = amount + self.blind
             # self.new_pot.emit()
             self.new_credits.emit()
             # Swap the active player
@@ -72,7 +75,7 @@ class TexasHoldEm(QObject):
     def fold(self):
         """ Då vinner automatiskt motståndaren? """
         # TODO: Avsluta spelet på något vis? Starta om?
-        self.credits[1 - self.active_player] += self.pot    # Ger motståndaren hela potten.
+        self.credits[1 - self.active_player] += self.pot    # Ge motståndaren hela potten.
         self.pot = 0
 
     def showdown(self):
@@ -128,7 +131,7 @@ class Buttons:
 
     def print_click(self):
         print('klick')
-        #print(TexasHoldEm.pot_func())
+        #TexasHoldEm.call()
 
     def print_fold(self):
         print('fold')
