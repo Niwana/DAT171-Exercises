@@ -11,11 +11,20 @@ import sys
 # TODO: Implementera check: "Att checka (eller passa) betyder att man väljer att inte satsa något nu, men ändå vill
 #  stanna kvar i given tillsvidare. Man kan checka så länge ingen annan öppnat."
 
-#  TODO: Läs på om nedanstående. Vi har
-#   inga separata pottar: "Att syna (engelska call) innebär att man går med på att betala så att ens pott innehåller
-#   samma belopp som den som öppnade eller höjde. Om spelaren A till höger B till exempel öppnade med 2 kr så måste B
-#   lägga 2 kr i sin egen pott för att syna. Observera än en gång att allt satsande sker i separata potter. Den stora
-#   potten i mitten är bara uppsamlingsplats för de marker som satsats i de enskilda satsningsrundorna." ~ wikipedia
+#  TODO: Läs på om nedanstående. Vi har inga separata pottar:
+#   "Att syna (engelska call) innebär att man går med på att betala så att ens pott innehåller samma belopp som den som
+#   öppnade eller höjde. Om spelaren A till höger B till exempel öppnade med 2 kr så måste B lägga 2 kr i sin egen pott
+#   för att syna. Observera än en gång att allt satsande sker i separata potter. Den stora potten i mitten är bara
+#   uppsamlingsplats för de marker som satsats i de enskilda satsningsrundorna." ~ wikipedia
+
+# TODO: Lägg till small blind och big blind. Spelarna turas om med varje. Blind dubbleras för varje game (?). Small
+#  blind är 50% av big blind. Big blind är 1/100 av spelarnas startsumma, så $10 för $1000.
+#  Lämpligt att köra på $50 k som start?
+#  "The normal case is that each player starts the tournament with 100 big blinds. If the small blind is 5 and the big
+#  blind is 10 chips, then each player would start with 1000 chips (10*100=1000). If you double the blinds from now on,
+#  from 5/10 to 10/20 to 20/40, then the blinds are sizable, resulting in a swift, but not chaotic game."
+
+
 
 class TexasHoldEm(QObject):
     new_credits = pyqtSignal()
@@ -28,7 +37,7 @@ class TexasHoldEm(QObject):
         self.pot = 0
         self.active_player = 0
         self.round_counter = 0
-        self.blind = 10
+        self.blind = 50
         self.previous_bet = 0
 
         print("Blind:", self.blind)
@@ -41,6 +50,11 @@ class TexasHoldEm(QObject):
             print("Call")
         else:
             print('Otillåten handling eller fel i call-funktionen')
+
+    def allin(self):
+        # TODO: när någon gör all in måste den andra spelaren folda eller också göra all in
+        self.pot += self.credit(self.active_player)
+        self.credit[self.active_player] = 0
 
     def flop(self):
         # TODO: Dela ut tre community cards på en gång. Efter det ett i taget tills fem stycken ligger på bordet.
@@ -55,10 +69,10 @@ class TexasHoldEm(QObject):
 
         if self.previous_bet == 0 and amount < self.blind:
             print("Bet must be equal to or higher than the blind!")
-        elif amount < self.previous_bet:
+        elif amount + self.blind < self.previous_bet:
             print("Bet must be equal to or higher than the previous raise")
-        elif amount <= self.credits[self.active_player]:
-            self.pot += amount
+        elif amount + self.blind <= self.credits[self.active_player]:
+            self.pot += amount + self.blind
             self.credits[self.active_player] -= amount
             self.previous_bet = amount + self.blind
             # self.new_pot.emit()
@@ -79,10 +93,10 @@ class TexasHoldEm(QObject):
         self.pot = 0
 
     def showdown(self):
-        """
         # TODO: Modifiera best_poker_hand så att även typ av hand returneras, inte bara det högsta kortet?
         # TODO: Implementera en metod som vänder/visar alla kort
 
+        """
         best_hand_player_0 = PokerHand.best_poker_hand(community_cards + player_0_hand) # hur göra detta?
         best_hand_player_1 = PokerHand.best_poker_hand(community_cards + player_0_hand)
 
@@ -131,7 +145,7 @@ class Buttons:
 
     def print_click(self):
         print('klick')
-        #TexasHoldEm.call()
+        # TexasHoldEm.call()
 
     def print_fold(self):
         print('fold')
