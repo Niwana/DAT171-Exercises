@@ -8,10 +8,7 @@ import sys
 # TODO: konstruera en välkomstruta där man anger spelarnas namn, startpengar och (big blind?) blinds värde?
 #  När rutan stängs (ok-knapp?) startar spelet.
 
-# TODO: Implementera check: "Att checka (eller passa) betyder att man väljer att inte satsa något nu, men ändå vill
-#  stanna kvar i given tillsvidare. Man kan checka så länge ingen annan öppnat."
-
-#  TODO: Läs på om nedanstående. Vi har inga separata pottar:
+#  TODO: Läs på om nedanstående. Vi har inga separata potter. Så det går till vid 1v1?
 #   "Att syna (engelska call) innebär att man går med på att betala så att ens pott innehåller samma belopp som den som
 #   öppnade eller höjde. Om spelaren A till höger B till exempel öppnade med 2 kr så måste B lägga 2 kr i sin egen pott
 #   för att syna. Observera än en gång att allt satsande sker i separata potter. Den stora potten i mitten är bara
@@ -24,6 +21,18 @@ import sys
 #  blind is 10 chips, then each player would start with 1000 chips (10*100=1000). If you double the blinds from now on,
 #  from 5/10 to 10/20 to 20/40, then the blinds are sizable, resulting in a swift, but not chaotic game."
 
+# TODO: visa i text på skärmen vad senaste bet/raise var?
+
+# TODO: om ena spelaren har bettat måste nästa call:a och sen checka.
+
+# TODO: implementera vem som är dealer.
+
+# TODO: Spelarna _MÅSTE_ call:a summorna från respektive blind vid rundands start (?) Ante däremot ökar linjärt (?)
+
+# TODO: highlighta de vinnande korten?
+
+# TODO: Efter att en spelare har raisat måste den andra spelaren ta ett beslut. Det läggs inga fler kort på bordet
+#  innan det är gjort.
 
 
 class TexasHoldEm(QObject):
@@ -33,11 +42,11 @@ class TexasHoldEm(QObject):
     def __init__(self):
         super().__init__()
         self.players = ['Name 1', 'Name 2']
-        self.credits = [1000, 1000]
+        self.credits = [50000, 50000]
         self.pot = 0
         self.active_player = 0
         self.round_counter = 0
-        self.blind = 50
+        self.blind = self.credits[0]/100
         self.previous_bet = 0
 
         print("Blind:", self.blind)
@@ -50,6 +59,11 @@ class TexasHoldEm(QObject):
             print("Call")
         else:
             print('Otillåten handling eller fel i call-funktionen')
+
+    def check(self):
+        """ "Att checka (eller passa) betyder att man väljer att inte satsa något nu, men ändå vill
+        stanna kvar i given tillsvidare. Man kan checka så länge ingen annan öppnat."""
+        self.active_player = 1 - self.active_player
 
     def allin(self):
         # TODO: när någon gör all in måste den andra spelaren folda eller också göra all in
