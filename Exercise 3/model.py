@@ -44,11 +44,12 @@ class TexasHoldEm(QObject):
     def __init__(self):
         super().__init__()
         self.players = ['Name 1', 'Name 2']
-        self.credits = [50000, 50000]
+        self.starting_chip_amount = 50000
+        self.credits = [self.starting_chip_amount, self.starting_chip_amount]
         self.pot = 0
         self.active_player = 0
         self.round_counter = 0
-        self.blind = self.credits[0]//100
+        self.blind = self.starting_chip_amount // 100
         self.previous_bet = 0
 
         print("Blind:", self.blind)
