@@ -40,6 +40,9 @@ import sys
 
 # TODO: Man kan ej folda när alla community cards är lagda. Då återstår check, bet och all in.
 
+deck = StandardDeck()
+deck.create_deck()
+deck.shuffle()
 
 class TexasHoldEm(QObject):
     new_credits = pyqtSignal()
@@ -120,15 +123,12 @@ class TexasHoldEm(QObject):
         """
         best_hand_player_0 = PokerHand.best_poker_hand(community_cards + player_0_hand) # hur göra detta?
         best_hand_player_1 = PokerHand.best_poker_hand(community_cards + player_0_hand)
-
         if best_hand_player_0 > best_hand_player_1:
             print("Player 0 won!")
             self.credits[0] += self.pot
-
         if best_hand_player_0 < best_hand_player_1:
             print("Player 1 won!")
             self.credits[1] += self.pot
-
         if best_hand_player_0 == best_hand_player_1
             # fördela potten jämnt om det är identiska vinnande händer
             print("Oavgjort")
@@ -141,8 +141,11 @@ class TexasHoldEm(QObject):
 
 class Player:
     def __init__(self):
-        self.cards = ['QS', '7C']
+        self.cards = ['2S', '3S']
+
+        #self.cards = deck.draw_card(2)
         self.marked_cards = [False] * len(self.cards)
+        print(self.cards)
         # self.credits = 1000
         # self.folded = False
         self.cb = None

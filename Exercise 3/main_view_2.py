@@ -27,7 +27,6 @@ class CardItem(QGraphicsSvgItem):
 class CardView(QGraphicsView):
     def read_cards():
         """
-
         :return:
         """
         all_cards = dict()
@@ -35,6 +34,8 @@ class CardView(QGraphicsView):
             for value in ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']:
                 file = value + suit
                 all_cards[file] = QSvgRenderer('cards/' + file + '.svg')
+        # print(type(all_cards))
+        # print(all_cards)
         return all_cards
 
     back_card = QSvgRenderer('cards/Red_Back_2.svg')
@@ -173,7 +174,7 @@ class InputBoxLayout(QGroupBox):
         raise_button = QPushButton('Raise')
         fold_button = QPushButton('Fold')
 
-        call_button.clicked.connect(model.buttons.print_click)
+        call_button.clicked.connect(model.Buttons.print_click)
 
         hbox_raise = QHBoxLayout()
         hbox_raise.addWidget(self.raise_button_field)
@@ -277,12 +278,12 @@ class GameView(QGroupBox):
         self.setLayout(vbox)
 
 
-player = model.Player()
-player_card_view = CardView(player)
+player_0 = model.Player()
+player_1 = model.Player()
+player_card_view = CardView(player_0)
 
 community_cards = model.CommunityCards()
 community_card_view = CardView(community_cards)
-
 view = GameView()
 view.show()
 qt_app.exec_()
@@ -291,24 +292,19 @@ qt_app.exec_()
         card1 = QLabel(self)
         card1.setPixmap(QPixmap('cards\\2C.svg'))
         card1.setAlignment(Qt.AlignCenter)
-
         card2 = QLabel(self)
         card2.setPixmap(QPixmap('cards\\3C.svg'))
         card2.setAlignment(Qt.AlignCenter)
-
         card3 = QLabel(self)
         card3.setPixmap(QPixmap('cards\\4C.svg'))
         card3.setAlignment(Qt.AlignCenter)
-
         card4 = QLabel(self)
         card4.setPixmap(QPixmap('cards\\5C.svg'))
         card4.setAlignment(Qt.AlignCenter)
-
         card5 = QLabel(self)
         card5.setPixmap(QPixmap('cards\\6C.svg'))
         card5.setAlignment(Qt.AlignCenter)
         QPixmap()
-
         hbox = QHBoxLayout()
         hbox.addWidget(card1)
         hbox.addWidget(card2)
