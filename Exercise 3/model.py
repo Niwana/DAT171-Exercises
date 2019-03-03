@@ -36,6 +36,10 @@ import sys
 
 # TODO: Visa blinds värde på skärmen.
 
+# TODO: Gör så att spelaren förlorar om credits är mindre än blind vid start av rundan
+
+# TODO: Man kan ej folda när alla community cards är lagda. Då återstår check, bet och all in.
+
 
 class TexasHoldEm(QObject):
     new_credits = pyqtSignal()
