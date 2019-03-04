@@ -139,13 +139,28 @@ class TexasHoldEm(QObject):
         """
 
 
+def card_to_display(hand):
+    cards_to_disp = []
+    for card in hand:
+        if card.get_suit() == 0:
+            cards_to_disp.append('{}{}'.format(card.get_value(), 'C'))
+        elif card.get_suit() == 1:
+            cards_to_disp.append('{}{}'.format(card.get_value(), 'D'))
+        elif card.get_suit() == 2:
+            cards_to_disp.append('{}{}'.format(card.get_value(), 'S'))
+        elif card.get_suit() == 3:
+            cards_to_disp.append('{}{}'.format(card.get_value(), 'H'))
+    return cards_to_disp
+
+
 class Player:
     def __init__(self):
-        self.cards = ['2S', '3S']
+        #self.cards = ['2S', '3S']
 
-        #self.cards = deck.draw_card(2)
-        self.marked_cards = [False] * len(self.cards)
-        print(self.cards)
+        self.cards_something = deck.draw_card(2)
+        self.cards = card_to_display(self.cards_something)
+
+        self.marked_cards = [False] * len(self.cards_something)
         # self.credits = 1000
         # self.folded = False
         self.cb = None
@@ -156,7 +171,9 @@ class CommunityCards(QObject):
 
     def __init__(self):
         super().__init__()
-        self.cards = ['2S', '3S', '4S']
+        self.cards = ['2S', '3S']
+        # self.cards = deck.draw_card(5)
+        #self.cards_to_disp = card_to_display(self.cards)
 
     def add_card(self):
         self.cards.append('2H')
