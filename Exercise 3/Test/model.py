@@ -69,16 +69,6 @@ class TexasHoldEm(QObject):
         else:
             print('Otillåten handling eller fel i call-funktionen')
 
-    def check(self):
-        """ "Att checka (eller passa) betyder att man väljer att inte satsa något nu, men ändå vill
-        stanna kvar i given tillsvidare. Man kan checka så länge ingen annan öppnat."""
-        self.active_player = 1 - self.active_player
-
-    def allin(self):
-        """ När någon gör all in måste den andra spelaren folda eller också göra all in """
-        self.pot += self.credit(self.active_player)
-        self.credit[self.active_player] = 0
-
     def flop(self):
         # TODO: Dela ut tre community cards på en gång. Efter det ett i taget tills fem stycken ligger på bordet.
         #   "In the third and fourth betting rounds, the stakes double." (???????)
@@ -93,13 +83,15 @@ class TexasHoldEm(QObject):
             print("Bet must be equal to or higher than the blind!")
         elif amount + self.blind < self.previous_bet:
             print("Bet must be equal to or higher than the previous raise.\n"
-            "You tried raising {} + {} (blind) for a total bet of {}.".format(amount, self.blind, amount+self.blind))
+            "You tried raising {} + {} (blind) for a total bet of {}.".format(amount, self.blind, amount+self.blind)) # TODO: Printar 1000 när man raisar med 500
         elif amount + self.blind <= self.credits[self.active_player]:
             self.pot += amount + self.blind
             self.credits[self.active_player] -= amount
             self.previous_bet = amount + self.blind
-            # self.new_pot.emit()
+
+            self.new_pot.emit()
             self.new_credits.emit()
+
             # Swap the active player
             self.active_player = 1 - self.active_player
 
@@ -138,7 +130,7 @@ class TexasHoldEm(QObject):
         """
 
 
-def card_to_display(hand):
+def convert_card_names(hand):
     cards = []
     for i, color in enumerate('CDSH'):
         for card in hand:
@@ -158,7 +150,7 @@ def card_to_display(hand):
 class Player:
     def __init__(self, name):
         self.cards = deck.draw_card(2)
-        self.cards_to_view = card_to_display(self.cards)
+        self.cards_to_view = convert_card_names(self.cards)
         self.name = name
 
         # self.credits = 1000
@@ -172,12 +164,7 @@ class CommunityCards(QObject):
     def __init__(self):
         super().__init__()
         self.cards = deck.draw_card(5)
-        self.cards_to_view = card_to_display(self.cards)
-        print(self.cards_to_view)
-
-#    def add_card(self):
-#        self.cards_to_view.append('2H')
-#        self.new_card.emit()
+        self.cards_to_view = convert_card_names(self.cards)
 
 
 class Buttons:
@@ -185,8 +172,23 @@ class Buttons:
         super().__init__()
 
     def print_click(self):
-        print('klick')
+        print('Call')
         # TexasHoldEm.call()
 
     def print_fold(self):
-        print('fold')
+        print('Fold')
+
+
+# TODO: Lägg till nedan om tid finns till
+'''
+    def check(self):
+        """ "Att checka (eller passa) betyder att man väljer att inte satsa något nu, men ändå vill
+        stanna kvar i given tillsvidare. Man kan checka så länge ingen annan öppnat."""
+        self.active_player = 1 - self.active_player
+    
+    
+    def all_in(self):
+        """ När någon gör all in måste den andra spelaren folda eller också göra all in """
+        self.pot += self.credit(self.active_player)
+        self.credit[self.active_player] = 0
+'''

@@ -65,15 +65,10 @@ class CardView(QGraphicsView):
     def update_view(self):
         for card in self.scene.items():
             card_height = card.boundingRect().bottom()
-            card_width = card.boundingRect().right()
 
             scale = (self.height() - 2 * self.padding) / card_height
-            scale_width = (self.width() - 2 * self.padding) / card_width / len(self.scene.items())
 
-            # card.setPos((self.width() - (self.card_spacing * len(self.scene.items()) / 2)) + card.position * self.card_spacing * scale, 0)
             card.setPos(card.position * self.card_spacing * scale, 0)
-
-            # card.setPos(card.position * self.card_spacing * scale, 0)
             card.setScale(scale)
 
         self.scene.setSceneRect(-self.padding, -self.padding, self.viewport().width(), self.viewport().height())
@@ -88,12 +83,11 @@ class CommunityCards(QGroupBox):
 
     def __init__(self):
         super().__init__("Community cards")
-
         font = QFont()
         font.setPointSize(20)
 
         pot = QLabel(self)
-        pot.setText('Pot 1000')
+        pot.setText('Pot Value')
         pot.setMargin(20)
         pot.setFont(font)
         pot.setAlignment(Qt.AlignCenter)
@@ -117,34 +111,33 @@ class InputBoxLayout(QGroupBox):
 
     def __init__(self, texas_model):
         super().__init__("Input box")
-        self.model = texas_model
 
         # Buttons
-        call_button = QPushButton('Call')
+        self.call_button = QPushButton('Call')
         self.raise_button_field = QLineEdit(self)
-        raise_button = QPushButton('Raise')
-        fold_button = QPushButton('Fold')
-
-        call_button.clicked.connect(model.Buttons.print_click)
+        self.raise_button = QPushButton('Raise')
+        self.fold_button = QPushButton('Fold')
 
         hbox_raise = QHBoxLayout()
         hbox_raise.addWidget(self.raise_button_field)
-        hbox_raise.addWidget(raise_button)
+        hbox_raise.addWidget(self.raise_button)
 
         vbox_buttons = QVBoxLayout()
-        vbox_buttons.addWidget(call_button)
+        vbox_buttons.addWidget(self.call_button)
         vbox_buttons.addLayout(hbox_raise)
-        vbox_buttons.addWidget(fold_button)
+        vbox_buttons.addWidget(self.fold_button)
 
         self.setLayout(vbox_buttons)
 
-        # game_model.new_card.connect(self.update_cards)
+        # Logic
+        self.model = texas_model
+        texas_model.new_credits.connect(self.update)
+        texas_model.new_pot.connect(self.update)
+        self.call_button.clicked.connect(model.Buttons.print_click)
+        #self.raise_button.clicked.connect(texas_model.bet)
+        self.fold_button.clicked.connect(model.Buttons.print_fold)
 
-        # Controllers
-        def press_fold_button():
-            model.add_card()
-
-        fold_button.clicked.connect(press_fold_button)
+        PlayerView.update_labels(self)
 
         def press_raise_button():
             input = self.raise_button_field.text()
@@ -154,19 +147,20 @@ class InputBoxLayout(QGroupBox):
             else:
                 print('The input format is incorrect. Please enter a value')
 
-        raise_button.clicked.connect(press_raise_button)
-'''
-    def update_cards(self):
+        self.raise_button.clicked.connect(press_raise_button)
+"""
+    def update(self):
         print('print update cards')
+        PlayerView.player_credits.setText("HEJ")
         # CardView.update_view()
-'''
+"""
 
 
 class PlayerView(QGroupBox):
     """ Active player """
 
-    def __init__(self, texas_model, player):
-        super().__init__("Active player")
+    def __init__(self, texas_model, player, i):
+        super().__init__("Player view")
 
         font = QFont()
         font.setPointSize(20)
@@ -175,16 +169,16 @@ class PlayerView(QGroupBox):
         self.player_credits.setAlignment(Qt.AlignCenter)
 
         self.player_name = QLabel()
-        self.player_name.setText(player_0.name)
+        self.player_name.setText(player.name)
         self.player_name.setMargin(20)
         self.player_name.setFont(font)
         self.player_name.setAlignment(Qt.AlignCenter)
         self.player_name.backgroundRole()
 
+
         hbox_cards = QHBoxLayout()
-        hbox_cards.addWidget(player_card_view[player])
-        bla = player_card_view[player]
-        print(bla)
+        hbox_cards.addWidget(player_card_view[i])
+
 
         hbox_remaining = QHBoxLayout()
         hbox_remaining.addWidget(self.player_credits)
@@ -207,8 +201,8 @@ class PlayerView(QGroupBox):
         texas_model.new_credits.connect(self.update_labels)
 
     def update_labels(self):
-        print('RUN')
-        self.player_credits.setText('Remaining money:' + str(self.model.credits[0]))
+        print("Update!")
+        #self.player_credits.setText('Remaining money:' + str(self.model.credits[0]))
 
 
 class GameView(QGroupBox):
@@ -221,12 +215,10 @@ class GameView(QGroupBox):
         hbox = QHBoxLayout()
 
         hbox.addWidget(InputBoxLayout(model.TexasHoldEm()), 1)
-        for i in range(len(player_card_view)):
-            hbox.addWidget(PlayerView(model.TexasHoldEm(), i), 10)
-            print(players[i])
 
+        for cv_index, player in enumerate(players):
+            hbox.addWidget(PlayerView(model.TexasHoldEm(), player, cv_index), 10)
 
-        # vbox.addWidget(PlayerView(model.TexasHoldEm()))
         vbox.addWidget(CommunityCards())
         vbox.addLayout(hbox)
 
@@ -234,20 +226,20 @@ class GameView(QGroupBox):
         self.setWindowTitle("Texas Hold'em")
         self.setLayout(vbox)
 
-players = []
-player_0 = model.Player('B1')
-player_1 = model.Player('B2')
-players.append(player_0)
-players.append(player_1)
 
-player_card_view = []
-player_card_view.append(CardView(player_0))
-player_card_view.append(CardView(player_1))
-print((player_0.name))
+if __name__ == '__main__':
 
+    # Create the player views
+    player = model.Player
+    players = [player('B1'), player('B2')]
 
-community_cards = model.CommunityCards()
-community_card_view = CardView(community_cards)
-view = GameView()
-view.show()
-qt_app.exec_()
+    player_card_view = []
+    for i in range(len(players)):
+        player_card_view.append(CardView(players[i]))
+
+    # Create the community cards view
+    community_cards = model.CommunityCards
+    community_card_view = CardView(community_cards())
+    view = GameView()
+    view.show()
+    qt_app.exec_()
