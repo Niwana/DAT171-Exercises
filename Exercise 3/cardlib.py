@@ -186,9 +186,10 @@ class Hand:
         functions = [p.check_straight_flush, p.check_four_of_a_kind, p.check_full_house, p.check_flush,
                      p.check_straight, p.check_three_of_a_kind, p.check_two_pair, p.check_one_pair, p.check_high_card]
 
-        for function in functions: # TODO: Lägg till enumerate och returnera värdet för att sedan jämföra det
+        for value, function in enumerate(functions): # TODO: Lägg till enumerate och returnera värdet för att sedan jämföra det
             if function(self, cards) is not None:
-                return function(self, cards)
+                poker_hand_rank = len(functions) - value
+                return function(self, cards), poker_hand_rank
 
 
 class StandardDeck:
