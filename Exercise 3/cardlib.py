@@ -187,7 +187,7 @@ class Hand:
         p = PokerHand
         functions = [p.check_straight_flush, p.check_four_of_a_kind, p.check_full_house, p.check_flush,
                      p.check_straight, p.check_three_of_a_kind, p.check_two_pair, p.check_one_pair, p.check_high_card]
-
+        # TODO: Körs fortfarande 2 gånger
         for function in functions:
             if function(self, cards) is not None:
                 return function(self, cards)
@@ -269,10 +269,11 @@ class PokerHand:
 
     def __str__(self):
         """ Returns a readable format of value and suit. """
-        return "{}".format(self.cards)
+        return "type: {}, highest: {}".format(self.type, self.highest_value)
 
     def __lt__(self, other):
         """ Returns self < other """
+        print(self.type, other.type)
         return self.type.value < other.type.value
 
     def check_high_card(self, cards=[]):
@@ -281,8 +282,10 @@ class PokerHand:
         :param cards: List of cards to check in addition of self.
         :return: The card with the highest value.
         """
-        cards = self.cards + cards
+        # TODO: Får inte alla kort om inte cards = self.cards + cards
+        #cards = self.cards + cards
         self.type = Rank.high_card
+        print(cards)
 
         highest_card = cards[0]
 
@@ -291,7 +294,6 @@ class PokerHand:
                 highest_card = card
 
         self.highest_value = (highest_card.get_value())
-
         return self # Hur får man detta till en PokerHand?
         #return self.highest_value, self.type
 
@@ -301,8 +303,8 @@ class PokerHand:
         :param cards: List of cards to check in addition of self.
         :return: A list containing the best pair in separate tuples for each card. Returns None if no pair is found.
         """
-        cards = self.cards + cards
-        cards.sort(reverse=True)
+        #cards = self.cards + cards
+        #cards.sort(reverse=True)
         self.type = Rank.one_pair
         values = []
         pairs = []
@@ -316,7 +318,8 @@ class PokerHand:
                 self.highest_value = (card.get_value())
 
         if pairs:
-            return self.highest_value, self.type
+            return self
+            #return self.highest_value, self.type
 
     def check_two_pair(self, cards=[]):
         """ Returns the two highest pairs if the list of cards has at least two pairs in it.
