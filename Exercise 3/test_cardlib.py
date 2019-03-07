@@ -301,26 +301,38 @@ def test_best_poker_hand():
 
 test_best_poker_hand()
 '''
-card_1 = num_card(9, suit.spades)
-card_2 = ace_card(suit.hearts)
-card_3 = king_card(suit.hearts)
+
+
+community_cards = [(num_card(9, suit.hearts)), (num_card(7, suit.hearts)), (num_card(5, suit.hearts))]
 
 player_1_cards = cardlib.Hand()
-player_1_cards.add_card(card_1)
-player_1_cards.add_card(card_2)
+player_1_cards.add_card(num_card(6, suit.spades))
+player_1_cards.add_card(num_card(10, suit.hearts))
 
 
 player_2_cards = cardlib.Hand()
-player_2_cards.add_card(card_2)
-player_2_cards.add_card(card_3)
-
-hand = cardlib.Hand()
-p1 = player_1_cards.best_poker_hand()
-print("se här", p1.highest_values)
+player_2_cards.add_card(num_card(8, suit.spades))
+player_2_cards.add_card(num_card(10, suit.spades))
 
 
+p1 = player_1_cards.best_poker_hand(community_cards)
+p2 = player_2_cards.best_poker_hand(community_cards)
 
-#print(cardlib.PokerHand.check_high_card(player_1_cards))
+print("p1:", p1)
+print("p2:", p2)
+#print(p1 > p2)
+print(type(p1))
 
-#cardlib.Hand.best_poker_hand(player_1_cards) < cardlib.Hand.best_poker_hand(player_2_cards)
-#print("test", type(cardlib.Hand.best_poker_hand(player_1_cards)))
+p3 = cardlib.PokerHand.check_high_card(player_1_cards)
+print(p3)
+print(type(p3))
+
+
+""" Vet inte om det var detta man skulle kunna få ut, eftersom det inte get något utan att köra de olika funktionerna"""
+'''
+poker = cardlib.PokerHand(player_1_cards)
+print(poker)
+print(poker.type)
+print(poker.highest_value)
+print(type(poker))
+'''
