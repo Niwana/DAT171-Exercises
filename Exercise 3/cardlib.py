@@ -182,15 +182,17 @@ class Hand:
 
     def best_poker_hand(self, cards=[]):
         """ Calculates the best poker hand. """
-        p = PokerHand
+        cards = self.cards + cards
+        p = PokerHand(cards)
         functions = [p.check_straight_flush, p.check_four_of_a_kind, p.check_full_house, p.check_flush,
                      p.check_straight, p.check_three_of_a_kind, p.check_two_pair, p.check_one_pair, p.check_high_card]
 
-        for value, function in enumerate(functions): # TODO: Lägg till enumerate och returnera värdet för att sedan jämföra det
-            if function(self, cards) is not None:
-                poker_hand_rank = len(functions) - value
-                return function(self, cards), poker_hand_rank
+        #p.type == Rank.high_card
+        #p.highest_values
 
+        for function in functions:
+           if function(cards) is not None:
+              return function(cards)
 
 class StandardDeck:
     """ A class that represent a standard card game deck, with functions
@@ -242,13 +244,39 @@ class StandardDeck:
         return drawn_cards
 
 
-class PokerHand(Hand):
+class Rank(enum.IntEnum):
+    high_card = 0
+    one_pair = 1
+    two_pair = 2
+    three_of_a_kind = 3
+    straight = 4
+    flush = 5
+    full_house = 6
+    four_of_a_kind = 7
+    straight_flush = 8
+
+
+
+class PokerHand:
     """ A class that represent the poker hand with functions for identifying the best poker hand. """
 
-    def __init__(self, cards):
+    def __init__(self, cards=[]):
         super().__init__()
-        self.cards = cards
+        self.cards = []
+        self.type = Rank
+        self.highest_values = []
 
+    def __lt__(self, other):
+        """ Returns self < other """
+        return self.type.value < other.type.value
+
+    '''
+    def get_value_of_hand(self):
+        get_value_of_hand = self.cards.get_value()
+        print("value of hand", get_value_of_hand)
+        #return
+
+    '''
     def check_high_card(self, cards=[]):
         """ Checks for the highest card in a list of cards and returns it.
 
@@ -256,13 +284,18 @@ class PokerHand(Hand):
         :return: The card with the highest value.
         """
         cards = self.cards + cards
+        print("high cards", cards)
+        self.type = Rank.high_card
+
         highest_card = cards[0]
 
         for card in cards:
             if card > highest_card:
                 highest_card = card
+        print((highest_card))
+        self.highest_values.append(highest_card.get_value())
+        return self
 
-        return [highest_card]
 
     def check_one_pair(self, cards=[]):
         """ Checks for the best pair in a list of cards. If no pair is found it returns None.
@@ -272,6 +305,7 @@ class PokerHand(Hand):
         """
         cards = self.cards + cards
         cards.sort(reverse=True)
+        self.type = Rank.one_pair
         values = []
         pairs = []
 
@@ -293,6 +327,7 @@ class PokerHand(Hand):
         """
         cards = self.cards + cards
         cards.sort(reverse=True)
+        self.type = Rank.two_pair
         values = []
         second_pair = []
         first_pair = []
@@ -320,6 +355,7 @@ class PokerHand(Hand):
         """
         cards = self.cards + cards
         cards.sort(reverse=True)
+        self.type = Rank.three_of_a_kind
         values = []
 
         for card in cards:
@@ -336,6 +372,7 @@ class PokerHand(Hand):
         :return: The the highest value card in the straight. Returns None if no straight is found.
         """
         values = []
+        self.type = Rank.straight
         cards = self.cards + cards
         cards.sort(reverse=True)
 
@@ -366,6 +403,7 @@ class PokerHand(Hand):
         """
         cards = self.cards + cards
         cards.sort(reverse=True)
+        self.type = Rank.flush
         club_cards = []
         diamond_cards = []
         spade_cards = []
@@ -402,6 +440,7 @@ class PokerHand(Hand):
         """
         cards = self.cards + cards
         cards.sort(reverse=True)
+        self.type = Rank.full_house
         values = []
         pair = []
         triplet = []
@@ -429,6 +468,7 @@ class PokerHand(Hand):
         """
         cards = self.cards + cards
         cards.sort(reverse=True)
+        self.type = Rank.four_of_a_kind
         values = []
         for card in cards:
             values.append(card.get_value())
@@ -446,6 +486,7 @@ class PokerHand(Hand):
         values = []
         cards = self.cards + cards
         cards.sort(reverse=True)
+        self.type = Rank.straight_flush
         for card in cards:
             values.append((card.get_value(), card.get_suit()))
 
@@ -462,3 +503,4 @@ class PokerHand(Hand):
                     break
             if found_straight:
                 return [card]
+
