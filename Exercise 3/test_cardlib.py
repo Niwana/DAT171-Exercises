@@ -303,29 +303,38 @@ test_best_poker_hand()
 '''
 
 
-community_cards = [(num_card(9, suit.hearts)), (num_card(7, suit.hearts)), (num_card(5, suit.hearts))]
+community_cards = [(num_card(6, suit.hearts)), (num_card(2, suit.hearts)), (num_card(3, suit.hearts))]
 
 player_1_cards = cardlib.Hand()
 player_1_cards.add_card(num_card(6, suit.spades))
-player_1_cards.add_card(num_card(10, suit.hearts))
+player_1_cards.add_card(num_card(8, suit.hearts))
 
 
 player_2_cards = cardlib.Hand()
-player_2_cards.add_card(num_card(8, suit.spades))
-player_2_cards.add_card(num_card(10, suit.spades))
+player_2_cards.add_card(num_card(9, suit.spades))
+player_2_cards.add_card(num_card(9, suit.hearts))
 
 
 p1 = player_1_cards.best_poker_hand(community_cards)
-p2 = player_2_cards.best_poker_hand(community_cards)
+#p2 = player_2_cards.best_poker_hand(community_cards)
 
-print("p1:", p1)
-print("p2:", p2)
+#print("p1:", p1)
+#print("p1 value:", p1.highest_value)
+#print(type(p1))
+#print("p2:", p2)
 #print(p1 > p2)
-print(type(p1))
 
-p3 = cardlib.PokerHand.check_high_card(player_1_cards)
-print(p3)
-print(type(p3))
+
+poker_hand = cardlib.PokerHand()
+p3 = poker_hand.check_high_card(player_1_cards)
+print("player 3:", p3)
+print(type(p3), "\n")
+
+p4 = poker_hand.check_one_pair(player_2_cards)
+print("player 4:", p4)
+print(type(p4), "\n")
+
+print("Comparison:", p3 < p4)
 
 
 """ Vet inte om det var detta man skulle kunna få ut, eftersom det inte get något utan att köra de olika funktionerna"""
