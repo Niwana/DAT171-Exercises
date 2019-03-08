@@ -42,7 +42,7 @@ class CardView(QGraphicsView):
     back_card = QSvgRenderer('cards/Red_Back_2.svg')
     all_cards = read_cards()
 
-    def __init__(self, cards, card_spacing=250, padding=2):
+    def __init__(self, cards, card_spacing=250, padding=0):
         self.scene = QGraphicsScene()
         super().__init__(self.scene)
 
@@ -57,22 +57,47 @@ class CardView(QGraphicsView):
         for index, card_ref in enumerate(self.cards.cards_to_view):
             renderer = self.all_cards[card_ref]
             card = CardItem(renderer, index)
+
+            shadow = QGraphicsDropShadowEffect(card)
+            shadow.setBlurRadius(10.)
+            shadow.setOffset(5, 5)
+            shadow.setColor(QColor(0, 0, 0, 180))  # Semi-transparent black!
+            card.setGraphicsEffect(shadow)
+
             self.scene.addItem(card)
 
         self.update_view()
 
     def update_view(self):
         for card in self.scene.items():
-            card_height = card.boundingRect().bottom()
+            orig_card_height = card.boundingRect().bottom()
+            orig_card_width = card.boundingRect().width()
 
-            scale = (self.height() - 2 * self.padding) / card_height
-            # scale_width = ((self.viewport().width() + self.padding)/2) / self.width()
+            scale = (self.viewport().height() - 2 * self.padding) / orig_card_height
+            scale_width = (self.viewport().width() - (len(self.scene.items()) + 1) * self.padding) / (orig_card_width * len(self.scene.items()))
 
-            # print(scale_width)
+            # scale_width = ((self.viewport().width() - 2 * len(self.scene.items()) * self.padding) / (orig_card_width * len(self.scene.items())))
 
-            card.setPos(card.position * self.card_spacing * scale, 0)
+            req_width = self.card_spacing * scale * len(self.scene.items())
+
+            # TODO: identifera vad som är fel. Stämmer villkoren och skalningen? Korten hoppar i storlek vid övergången
+            if req_width > self.viewport().width():
+                scale = scale_width * 0.9
+
+            margin_height = (self.viewport().height() - (orig_card_height * scale)) / 2
+            margin_width = (self.viewport().width() - (len(self.scene.items()) -1) * self.card_spacing * scale - (orig_card_width * scale))/2
+
+            card.setPos(margin_width + card.position * self.card_spacing * scale, margin_height)
             card.setScale(scale)
-
+            """
+            print("orig_card_height", orig_card_height)
+            print("orig_card_width", orig_card_width)
+            print("scale", scale)
+            print("actual card height", orig_card_height * scale)
+            print("spacing", self.card_spacing * scale)
+            print("Req space", req_width)
+            print("\n")
+            """
         self.scene.setSceneRect(-self.padding, -self.padding, self.viewport().width(), self.viewport().height())
 
     def resizeEvent(self, painter):
@@ -88,11 +113,11 @@ class CommunityCards(QGroupBox):
         self.texas_model = texas_model
 
         font = QFont()
-        font.setPointSize(20)
+        font.setPointSize(18)
 
         self.pot = QLabel(self)
         self.pot.setText('Pot Value')
-        self.pot.setMargin(20)
+        self.pot.setMargin(18)
         self.pot.setFont(font)
         self.pot.setAlignment(Qt.AlignCenter)
 
@@ -179,7 +204,7 @@ class PlayerView(QGroupBox):
         self.model = texas_model
         self.player = player
         font = QFont()
-        font.setPointSize(20)
+        font.setPointSize(18)
 
         self.player_credits = QLabel()
         self.player_credits.setAlignment(Qt.AlignCenter)
