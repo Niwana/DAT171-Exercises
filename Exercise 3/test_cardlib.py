@@ -214,8 +214,13 @@ def test_straight_flush():
     community_cards = [(num_card(1, suit.spades)), (num_card(2, suit.spades)), (num_card(3, suit.spades)),
                        (num_card(4, suit.spades)), (num_card(5, suit.spades))]
 
-    check = cardlib.PokerHand.check_straight_flush(player_1_cards, community_cards)
-    assert check == [num_card(7, suit.spades)]
+    poker_hand = player_1_cards.best_poker_hand(community_cards)
+
+    #assert poker_hand.type == Rank.straight_flush
+    #assert poker_hand.highest_values[0] == 7
+
+    #assert check == [num_card(7, suit.spades)]
+
 
 '''
 def test_best_poker_hand():
@@ -302,12 +307,11 @@ def test_best_poker_hand():
 test_best_poker_hand()
 '''
 
-card_1 = num_card(6, suit.spades)
-community_cards = [(num_card(6, suit.hearts)), (num_card(2, suit.hearts)), (num_card(3, suit.hearts))]
+community_cards = [(num_card(2, suit.hearts)), (num_card(3, suit.hearts)), (num_card(4, suit.hearts))]
 
 player_1_cards = cardlib.Hand()
-player_1_cards.add_card(num_card(6, suit.spades))
-player_1_cards.add_card(num_card(8, suit.hearts))
+player_1_cards.add_card(num_card(5, suit.hearts))
+player_1_cards.add_card(num_card(6, suit.hearts))
 
 
 player_2_cards = cardlib.Hand()
@@ -318,29 +322,8 @@ player_2_cards.add_card(num_card(9, suit.hearts))
 #p1 = player_1_cards.best_poker_hand(community_cards)
 #p2 = player_2_cards.best_poker_hand(community_cards)
 
-#print("p1:", p1)
-#print("p1 value:", p1.highest_value)
-#print(type(p1))
-#print("p2:", p2)
-#print(p1 > p2)
-
-from cardlib import PokerHand
-
-poker_hand = cardlib.PokerHand()
-#p3 = poker_hand(player_1_cards)
-p3 = poker_hand.check_high_card(player_1_cards)
-print("p3", type(p3))
-#print("p3", p3.cards)
-#print("p3", p3.highest_value)
-#print("p3", p3.type)
-
-p4 = poker_hand.check_one_pair(player_2_cards)
-print("\np4", type(p4))
-#print("p4", p4.cards)
-#print("p4", p4.highest_value)
-#print("p4", p4.type)
-
-print("\nComparison:", "\np3: ", p3, "\np4: ", p4, "\n", p3 == p4)
+poker_hand = player_1_cards.best_poker_hand(community_cards)
+print(poker_hand)
 
 
 '''

@@ -184,16 +184,9 @@ class Hand:
     def best_poker_hand(self, cards=[]):
         """ Calculates the best poker hand. """
 
-        p = PokerHand
-        functions = [p.check_straight_flush, p.check_four_of_a_kind, p.check_full_house, p.check_flush,
-                     p.check_straight, p.check_three_of_a_kind, p.check_two_pair, p.check_one_pair, p.check_high_card]
-        # TODO: Körs fortfarande 2 gånger
-        for function in functions:
-            if function(self, cards) is not None:
-                return function(self, cards)
+        p = PokerHand(self.cards + cards)
 
-        # p.type == Rank.high_card
-        # p.highest_values
+        return p
 
 
 class StandardDeck:
@@ -262,17 +255,23 @@ class PokerHand:
     """ A class that represent the poker hand with functions for identifying the best poker hand. """
 
     def __init__(self, cards=[]):
-        self.cards = cards
-        self.type = Rank
-        self.highest_value = 0
+        self.type = Rank.high_card
+        self.highest_values = []
+
+        functions = [self.check_straight_flush, self.check_four_of_a_kind, self.check_full_house, self.check_flush,
+                     self.check_straight, self.check_three_of_a_kind, self.check_two_pair, self.check_one_pair,
+                     self.check_high_card]
+
+        for function in functions:
+            if function(cards) is True:
+                return
 
     def __str__(self):
         """ Returns a readable format of value and suit. """
-        return "type: {}, highest: {}".format(self.type, self.highest_value)
+        return "type: {}, highest: {}".format(self.type, self.highest_values)
 
     def __lt__(self, other):
         """ Returns self < other """
-        #print(self.type, other.type)
         return self.type.value < other.type.value
 
     def check_high_card(self, cards=[]):
@@ -282,10 +281,8 @@ class PokerHand:
         :return: The card with the highest value.
         """
         # TODO: Får inte alla kort om inte cards = self.cards + cards
-#        cards = self.cards + cards
-        self.cards = cards
+
         self.type = Rank.high_card
-        #print("cards",cards)
 
         highest_card = cards[0]
 
@@ -293,9 +290,7 @@ class PokerHand:
             if card > highest_card:
                 highest_card = card
 
-        self.highest_value = (highest_card.get_value())
-        return self # Hur får man detta till en PokerHand?
-        #return self.highest_value, self.type
+        self.highest_values.append(highest_card.get_value())
 
     def check_one_pair(self, cards=[]):
         """ Checks for the best pair in a list of cards. If no pair is found it returns None.
@@ -303,24 +298,24 @@ class PokerHand:
         :param cards: List of cards to check in addition of self.
         :return: A list containing the best pair in separate tuples for each card. Returns None if no pair is found.
         """
-        #cards = self.cards + cards
-        #cards.sort(reverse=True)
-        self.cards = cards
+        cards.sort(reverse=True)
         self.type = Rank.one_pair
+
         values = []
-        pairs = []
 
         for card in cards:
             values.append(card.get_value())
 
+        found_pair = False
         for card in cards:
-            if (values.count(card.get_value())) == 2 and len(pairs) < 2:
-                pairs.append(card)
-                self.highest_value = (card.get_value())
+            if (values.count(card.get_value())) == 2:
+                self.highest_values.append(card.get_value())
+                found_pair = True
 
-        if pairs:
-            return self
-            #return self.highest_value, self.type
+        self.highest_values = sorted(list(set(self.highest_values)), reverse=True)
+
+        return found_pair
+
 
     def check_two_pair(self, cards=[]):
         """ Returns the two highest pairs if the list of cards has at least two pairs in it.
@@ -328,7 +323,7 @@ class PokerHand:
         :param cards: List of cards to check in addition of self.
         :return: A list containing the best two pairs with the highest pair first. Returns None if no pairs are found.
         """
-        cards = self.cards + cards
+
         cards.sort(reverse=True)
         self.type = Rank.two_pair
         values = []
@@ -341,16 +336,18 @@ class PokerHand:
         for card in cards:
             if (values.count(card.get_value())) >= 2 > len(first_pair):
                 first_pair.append(card)
-                self.highest_value = card.get_value()  # The first pair will always be the one with the highest value
+                self.highest_values.append(card.get_value())
 
         for card in cards:
             if (values.count(card.get_value())) >= 2 > len(second_pair) and \
                     card.get_value() != first_pair[0].get_value():
                 second_pair.append(card)
+                self.highest_values.append(card.get_value())
 
+        self.highest_values = sorted(list(set(self.highest_values)), reverse=True)
 
         if first_pair and second_pair:
-            return self.highest_value, self.type
+            return True
 
     def check_three_of_a_kind(self, cards=[]):
         """ Checks if the list of cards contain three of a kind.
@@ -358,7 +355,6 @@ class PokerHand:
         :param cards: List of cards to check in addition of self.
         :return: A list containing the three cards as tuples. Returns None if no pair is found.
         """
-        cards = self.cards + cards
         cards.sort(reverse=True)
         self.type = Rank.three_of_a_kind
         values = []
@@ -368,8 +364,9 @@ class PokerHand:
 
         for i, card in enumerate(cards):
             if (values.count(card.get_value())) >= 3:
-                self.highest_value = card.get_value()
-                return self.highest_value, self.type
+                self.highest_values.append(card.get_value())
+                self.highest_values = sorted(list(set(self.highest_values)), reverse=True)
+                return True
 
     def check_straight(self, cards=[]):
         """ Checks for the best straight in a list of cards.
@@ -379,7 +376,6 @@ class PokerHand:
         """
         values = []
 
-        cards = self.cards + cards
         cards.sort(reverse=True)
         self.type = Rank.straight
 
@@ -398,8 +394,8 @@ class PokerHand:
                     found_straight = False
                     break
             if found_straight:
-                self.highest_value = card.get_value()
-                return self.highest_value, self.type
+                self.highest_values.append(card.get_value())
+                return True
 
     def check_flush(self, cards=[]):
         """ Checks for the best flush in a list of cards. It can handle multiple flushes
@@ -409,7 +405,6 @@ class PokerHand:
         :return: Returns a list of the five highest cards of the suit with the highest flush. Returns None if
         no flush is found.
         """
-        cards = self.cards + cards
         cards.sort(reverse=True)
         self.type = Rank.flush
         club_cards = []
@@ -438,8 +433,8 @@ class PokerHand:
 
         for i in range(len(list_of_flushes)):
             if list_of_flushes[i]:
-                self.highest_value = max(list_of_flushes)[:5][0].get_value()
-                return self.highest_value, self.type
+                self.highest_values = [max(list_of_flushes)[:5][0].get_value()]
+                return True
 
     def check_full_house(self, cards=[]):
         """ Checks for the best full house in a list of cards.
@@ -447,7 +442,6 @@ class PokerHand:
         :param cards: List of cards to check in addition of self.
         :return: Returns a list with the triplet first and then the pair. Return None if no full house is found.
         """
-        cards = self.cards + cards
         cards.sort(reverse=True)
         self.type = Rank.full_house
         values = []
@@ -460,15 +454,16 @@ class PokerHand:
         for card in cards:
             if (values.count(card.get_value())) >= 3 > len(triplet):
                 triplet.append(card)
+                self.highest_values.append(card.get_value())
 
         if triplet:
             for card in cards:
                 if (values.count(card.get_value())) >= 2 > len(pair) and card.get_value() != triplet[0].get_value():
                     pair.append(card)
-                    self.highest_value = card.get_value()
-
+                    self.highest_values.append(card.get_value())
+        self.highest_values = sorted(list(set(self.highest_values)), reverse=True)
         if triplet and pair:
-            return self.highest_value, self.type
+            return True  # TODO: vad väger tyngst i kåken, tre låga eller två höga?
 
     def check_four_of_a_kind(self, cards=[]):
         """ Checks if the list of cards contain four of a kind.
@@ -476,7 +471,6 @@ class PokerHand:
         :param cards: List of cards to check in addition of self.
         :return: Returns a list containing four cards. Returns None if no four of a kind is found.
         """
-        cards = self.cards + cards
         cards.sort(reverse=True)
         self.type = Rank.four_of_a_kind
         values = []
@@ -485,8 +479,9 @@ class PokerHand:
 
         for i, card in enumerate(cards):
             if (values.count(card.get_value())) >= 4:
-                self.highest_value = card.get_value()
-                return self.highest_value, self.type
+                self.highest_values.append(card.get_value())
+                self.highest_values = sorted(list(set(self.highest_values)), reverse=True)
+                return True
 
     def check_straight_flush(self, cards=[]):
         """ Checks a list of cards for the best straight flush.
@@ -495,7 +490,6 @@ class PokerHand:
         :return: Returns the highest-ranking card in the flush. If no flush is found it returns None.
         """
         values = []
-        cards = self.cards + cards
         cards.sort(reverse=True)
         self.type = Rank.straight_flush
 
@@ -514,5 +508,5 @@ class PokerHand:
                     found_straight = False
                     break
             if found_straight:
-                self.highest_value = card.get_value()
-                return self.highest_value, self.type
+                self.highest_values.append(card.get_value())
+                return True

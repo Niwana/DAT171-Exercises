@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
-# TODO: lägg till bet, check, call?
 
 # Låt vinsten vara en funktion med potten som input. Kom ihåg att lägga till signals.
 # g.player[0].win_money(pot)
@@ -25,6 +24,7 @@ class CardItem(QGraphicsSvgItem):
 
 
 class CardView(QGraphicsView):
+
     def read_cards():
         """
         :return:
@@ -51,6 +51,9 @@ class CardView(QGraphicsView):
 
         self.cards = cards
         self.change_cards()
+
+        # self.cards.new_player_cards.connect(self.change_cards)
+        # self.cards.new_community_cards.connect(self.change_cards)
 
     def change_cards(self):
         self.scene.clear()
@@ -89,15 +92,7 @@ class CardView(QGraphicsView):
 
             card.setPos(margin_width + card.position * self.card_spacing * scale, margin_height)
             card.setScale(scale)
-            """
-            print("orig_card_height", orig_card_height)
-            print("orig_card_width", orig_card_width)
-            print("scale", scale)
-            print("actual card height", orig_card_height * scale)
-            print("spacing", self.card_spacing * scale)
-            print("Req space", req_width)
-            print("\n")
-            """
+
         self.scene.setSceneRect(-self.padding, -self.padding, self.viewport().width(), self.viewport().height())
 
     def resizeEvent(self, painter):
@@ -168,34 +163,15 @@ class InputBoxLayout(QGroupBox):
 
         # Logic
         self.model = texas_model
-        self.call_button.clicked.connect(model.Buttons.print_click)
-        self.fold_button.clicked.connect(model.Buttons.print_fold)
+        self.call_button.clicked.connect(self.model.call)
+        self.fold_button.clicked.connect(self.model.fold)
 
         def bet():
             bet_amount = self.raise_button_field.text()
             if bet_amount.isdigit():
                 self.model.bet(int(bet_amount))
-            print(texas_model.pot)
 
         self.raise_button.clicked.connect(bet)
-
-
-'''
-        def press_raise_button():
-            input = self.raise_button_field.text()
-            if input.isdigit():
-                texas_model.bet(int(input))
-                #PlayerView.update_labels()  # Crashar när man kör denna funktion
-            else:
-                print('The input format is incorrect. Please enter a value')
-'''
-# self.raise_button.clicked.connect(press_raise_button)
-"""
-    def update(self):
-        print('print update cards')
-        PlayerView.player_credits.setText("HEJ")
-        # CardView.update_view()
-"""
 
 
 class PlayerView(QGroupBox):
@@ -244,7 +220,6 @@ class PlayerView(QGroupBox):
         self.update_labels()
 
     def update_labels(self):
-        print("Update")
         self.player_credits.setText("Credits:" + str(self.player.credits))
 
 
@@ -269,5 +244,14 @@ class GameView(QGroupBox):
         # self.setGeometry(300, 300, 1000, 600)
         self.setWindowTitle("Texas Hold'em")
         self.setLayout(vbox)
+
+        texas_model.game_message.connect(self.alert_user)
+
+    def alert_user(self, text):
+        box = QMessageBox()
+        box.setText(text)
+        box.exec_()
+
+
 
 

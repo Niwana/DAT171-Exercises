@@ -4,31 +4,15 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import sys
 
+
 # TODO: konstruera en välkomstruta där man anger spelarnas namn, startpengar och (big blind?) blinds värde?
 #  När rutan stängs (ok-knapp?) startar spelet.
-
-#  TODO: Läs på om nedanstående. Vi har inga separata potter. Så det går till vid 1v1?
-#   "Att syna (engelska call) innebär att man går med på att betala så att ens pott innehåller samma belopp som den som
-#   öppnade eller höjde. Om spelaren A till höger B till exempel öppnade med 2 kr så måste B lägga 2 kr i sin egen pott
-#   för att syna. Observera än en gång att allt satsande sker i separata potter. Den stora potten i mitten är bara
-#   uppsamlingsplats för de marker som satsats i de enskilda satsningsrundorna." ~ wikipedia
-
-# TODO: Lägg till small blind och big blind. Spelarna turas om med varje. Blind dubbleras för varje game (?). Small
-#  blind är 50% av big blind. Big blind är 1/100 av spelarnas startsumma, så $10 för $1000.
-#  Lämpligt att köra på $50 k som start?
-#  "The normal case is that each player starts the tournament with 100 big blinds. If the small blind is 5 and the big
-#  blind is 10 chips, then each player would start with 1000 chips (10*100=1000). If you double the blinds from now on,
-#  from 5/10 to 10/20 to 20/40, then the blinds are sizable, resulting in a swift, but not chaotic game."
 
 # TODO: visa i text på skärmen vad senaste bet/raise var?
 
 # TODO: om ena spelaren har bettat måste nästa call:a och sen checka.
 
 # TODO: implementera vem som är dealer.
-
-# TODO: Spelarna _MÅSTE_ call:a summorna från respektive blind vid rundands start (?) Ante däremot ökar linjärt (?)
-
-# TODO: highlighta de vinnande korten?
 
 # TODO: Efter att en spelare har raisat måste den andra spelaren ta ett beslut. Det läggs inga fler kort på bordet
 #  innan det är gjort.
@@ -55,36 +39,61 @@ class DeckModel:
 class TexasHoldEm(QObject):
     new_credits = pyqtSignal()
     new_pot = pyqtSignal()
+    game_message = pyqtSignal((str,))
+
+    new_cards = pyqtSignal()
 
     def __init__(self, players, deck_model, starting_credits):
         super().__init__()
         self.players = players
         self.active_player = 0
-        self.pot = 0
-        self.blind = starting_credits // 100
-        self.previous_bet = 0
-        #self.deck = StandardDeck()
-        #self.deck.create_deck()
-        #self.deck.shuffle()
+        players[0].active = True
+        self.deck = deck_model
 
-        print("Blind:", self.blind)
+        self.pot = 0
+        self.big_blind = starting_credits // 100
+        self.small_blind = self.big_blind // 2
+        self.initiate_blind(self.small_blind + self.big_blind)
+        self.previous_bet = self.small_blind
+        self.actions = 0
 
         # Create the community cards view
-        self.community_cards = CommunityCards(deck_model)
+        self.community_cards = CommunityCards(self.deck)
+
+    def initiate_blind(self, blinds):
+        for player in self.players:
+            if player.active:
+                player.credits -= self.small_blind
+            else:
+                player.credits -= self.big_blind
+        self.pot += blinds
+        self.new_pot.emit()
 
     def call(self):
         """ Måste satsa lika mycket som den spelare som satsat mest."""
-        if self.credit(self.active_player) >= self.previous_bet and not self.previous_bet == 0:
+        if self.players[self.active_player].credits >= self.previous_bet and not self.previous_bet == 0:
             self.pot += self.previous_bet
-            self.credits[self.active_player] -= self.previous_bet
-            print("Call")
+            # print(self.previous_bet)
+            self.players[self.active_player].credits -= self.previous_bet
+            self.actions += 1
+            self.new_pot.emit()
+            self.new_credits.emit()
+
+            self.active_player = (self.active_player + 1) % len(self.players)
+            if self.actions == len(self.players):
+                pass
+                # self.community_cards.flop()
+                # self.new_cards.emit()
+            if self.actions == 3 * len(self.players):
+                self.showdown()
+
         else:
-            print('Otillåten handling eller fel i call-funktionen')
+            text = 'Action not allowed'
+            self.game_message.emit(text)
 
     def flop(self):
-        # TODO: Dela ut tre community cards på en gång. Efter det ett i taget tills fem stycken ligger på bordet.
-        #   "In the third and fourth betting rounds, the stakes double." (???????)
-        pass
+        self.card_model.deck.draw_card(0)
+        convert_card_names(self.cards)
 
     def turn(self):  # Add the 4th card
         pass
@@ -93,14 +102,15 @@ class TexasHoldEm(QObject):
         pass
 
     def bet(self, amount):
-        # TODO: Besluta om vi ska köra no-limit texas holdem, limit eller pot-limit.
-        # TODO: Byt från print() till dialogrutor vid varningar. box = QMessageBox(), box.setText(), box.exec__()
-        # TODO: Hur hantera all-in?
+        # TODO: applicera villkoren nedan
         self.pot += amount
         self.new_pot.emit()
 
         self.players[self.active_player].credits -= amount
         self.new_credits.emit()
+
+        self.previous_bet = amount
+
         self.active_player = (self.active_player + 1) % len(self.players)
 
         '''
@@ -124,44 +134,52 @@ class TexasHoldEm(QObject):
 
     def fold(self):
         """ Då vinner automatiskt motståndaren? """
-        # TODO: Avsluta spelet på något vis? Starta om?
-        self.credits[1 - self.active_player] += self.pot  # Ge motståndaren hela potten.
+        self.players[1-self.active_player].credits += self.pot  # Ge motståndaren hela potten.
         self.pot = 0
+        self.new_pot.emit()
+        self.new_credits.emit()
 
     def showdown(self):
-        # TODO: Modifiera best_poker_hand så att även typ av hand returneras, inte bara det högsta kortet?
-        # TODO: Implementera en metod som vänder/visar alla kort
+        p0 = self.players[0].hand.best_poker_hand(self.community_cards.cards)
+        p1 = self.players[1].hand.best_poker_hand(self.community_cards.cards)
 
-        # TODO: Färdigställ showdown. Inkomplett jämförelse mellan vinnarna?
-        # TODO: Emit() efter pot. Ändra self.players?
-
-        p0, ind0 = self.players[0].hand.best_poker_hand(self.community_cards.cards)
-        p1, ind1 = self.players[1].hand.best_poker_hand(self.community_cards.cards)
-
-        if ind0 > ind1:
-            print("Player 0 won!")
+        if p0.type > p1.type:
+            text = "Player {} won!".format(self.players[0].name)
+            self.game_message.emit(text)
             self.players[0].credits += self.pot
-        if ind0 < ind1:
-            print("Player 1 won!")
+
+        if p0.type < p1.type:
+            text = "Player {} won!".format(self.players[1].name)
+            self.game_message.emit(text)
             self.players[1].credits += self.pot
-        if ind0 == ind1:
-            if p0[0] > p1[0]:
-                print("Player 0 won! Identiska händer men högre kort")
+
+        if p0.type == p1.type:
+            if p0.highest_values > p1.highest_values:
+                text = "Player {} won!".format(self.players[0].name)
+                self.game_message.emit(text)
                 self.players[0].credits += self.pot
-                self.new_pot.emit()
-            if p0[0] < p1[0]:
-                print("Player 1 won! Identiska händer men högre kort")
+
+            elif p0.highest_values < p1.highest_values:
+                text = "Player {} won!".format(self.players[1].name)
+                self.game_message.emit(text)
                 self.players[1].credits += self.pot
-                self.new_pot.emit()
 
-            if p0[0].get_value() == p1[0].get_value():
-                print("Oavgjort")
-                self.credits[0] += (self.pot / 2)
-                self.credits[1] += (self.pot / 2)
-                self.new_pot.emit()
+            elif p0.highest_values == p1.highest_values:
+                text = "Draw!"
+                self.game_message.emit(text)
+                for player in self.players:
+                    player.credits += (self.pot // len(self.players))
+            else:
+                self.game_message.emit("Incorrect comparison of poker hands")
 
-        else:
-            print("Fel vid jämförelsen?")
+        self.new_credits.emit()
+        self.pot = 0
+        self.new_pot.emit()
+
+    def restart(self):
+        pass
+
+
 
 
 def convert_card_names(hand):
@@ -181,9 +199,12 @@ def convert_card_names(hand):
     return cards
 
 
-class Player:
-    def __init__(self, player_name, card_model, starting_credits=50000):
-        self.cards = card_model.deck.draw_card(2) # TODO: Fixa
+class Player(QObject):
+    # new_community_cards = pyqtSignal()
+
+    def __init__(self, player_name, deck_model, starting_credits=50000):
+        super().__init__()
+        self.cards = deck_model.deck.draw_card(2)  # TODO: Fixa
         self.hand = Hand()
         for card in self.cards:
             self.hand.add_card(card)
@@ -193,25 +214,39 @@ class Player:
         self.credits = starting_credits
         self.active = False
 
+        # self.new_community_cards.emit()
 
-class CommunityCards:
-    def __init__(self, card_model):
+
+class CommunityCards(QObject):
+    # new_community_cards = pyqtSignal()
+
+    def __init__(self, deck_model):
         super().__init__()
-        self.cards = card_model.deck.draw_card(5)
+        self.deck = deck_model.deck
+        self.cards = deck_model.deck.draw_card(5)
         self.cards_to_view = convert_card_names(self.cards)
 
+    def flop(self):
+        self.cards = self.deck.deck.draw_card(3)
+        self.cards_to_view = convert_card_names(self.cards)
 
+        # self.new_community_cards.emit()
+
+        # self.deck.draw_card(3)
+        # self.cards_to_view = convert_card_names(self.cards)
+
+'''
 class Buttons:
     def __init__(self):
         super().__init__()
 
     def print_click(self):
         print('Call')
-        # TexasHoldEm.call()
+        texas_model = TexasHoldEm.call()
 
     def print_fold(self):
         print('Fold')
-
+'''
 
 # TODO: Lägg till nedan om tid finns till
 '''
