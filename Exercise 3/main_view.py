@@ -121,6 +121,8 @@ class CommunityCards(QGroupBox):
         self.pot.setFont(font)
         self.pot.setAlignment(Qt.AlignCenter)
 
+        community_card_view = CardView(texas_model.community_cards)
+
         hbox = QHBoxLayout()
         hbox.addWidget(community_card_view)
 
@@ -199,7 +201,7 @@ class InputBoxLayout(QGroupBox):
 class PlayerView(QGroupBox):
     """ Active player """
 
-    def __init__(self, texas_model, player, i):
+    def __init__(self, texas_model, player):
         super().__init__("Player view")
         self.model = texas_model
         self.player = player
@@ -216,8 +218,10 @@ class PlayerView(QGroupBox):
         self.player_name.setAlignment(Qt.AlignCenter)
         self.player_name.backgroundRole()
 
+        player_card_view = CardView(player)
+
         hbox_cards = QHBoxLayout()
-        hbox_cards.addWidget(player_card_view[i])
+        hbox_cards.addWidget(player_card_view)
 
         hbox_remaining = QHBoxLayout()
         hbox_remaining.addWidget(self.player_credits)
@@ -247,7 +251,7 @@ class PlayerView(QGroupBox):
 class GameView(QGroupBox):
     """ main window """
 
-    def __init__(self, texas_model):
+    def __init__(self, texas_model, players):
         super().__init__("main window")
         self.model = texas_model
 
@@ -257,7 +261,7 @@ class GameView(QGroupBox):
         hbox.addWidget(InputBoxLayout(texas_model), 1)
 
         for cv_index, player in enumerate(players):
-            hbox.addWidget(PlayerView(texas_model, player, cv_index), 10)
+            hbox.addWidget(PlayerView(texas_model, player), 10)
 
         vbox.addWidget(CommunityCards(texas_model))
         vbox.addLayout(hbox)
@@ -267,18 +271,3 @@ class GameView(QGroupBox):
         self.setLayout(vbox)
 
 
-# Create the player views
-players = [model.Player('B1'), model.Player('B2')]
-
-players[0].active = True
-
-player_card_view = []
-for i in range(len(players)):
-    player_card_view.append(CardView(players[i]))
-
-
-texas_model = model.TexasHoldEm(players, starting_credits=50000)
-community_card_view = CardView(texas_model.community_cards)
-view = GameView(texas_model)
-view.show()
-qt_app.exec_()

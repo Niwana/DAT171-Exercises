@@ -261,9 +261,8 @@ class Rank(enum.IntEnum):
 class PokerHand:
     """ A class that represent the poker hand with functions for identifying the best poker hand. """
 
-    def __init__(self):
-        super().__init__()
-        self.cards = []
+    def __init__(self, cards=[]):
+        self.cards = cards
         self.type = Rank
         self.highest_value = 0
 
@@ -273,7 +272,7 @@ class PokerHand:
 
     def __lt__(self, other):
         """ Returns self < other """
-        print(self.type, other.type)
+        #print(self.type, other.type)
         return self.type.value < other.type.value
 
     def check_high_card(self, cards=[]):
@@ -283,9 +282,10 @@ class PokerHand:
         :return: The card with the highest value.
         """
         # TODO: Får inte alla kort om inte cards = self.cards + cards
-        #cards = self.cards + cards
+#        cards = self.cards + cards
+        self.cards = cards
         self.type = Rank.high_card
-        print(cards)
+        #print("cards",cards)
 
         highest_card = cards[0]
 
@@ -305,6 +305,7 @@ class PokerHand:
         """
         #cards = self.cards + cards
         #cards.sort(reverse=True)
+        self.cards = cards
         self.type = Rank.one_pair
         values = []
         pairs = []

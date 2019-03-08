@@ -302,7 +302,7 @@ def test_best_poker_hand():
 test_best_poker_hand()
 '''
 
-
+card_1 = num_card(6, suit.spades)
 community_cards = [(num_card(6, suit.hearts)), (num_card(2, suit.hearts)), (num_card(3, suit.hearts))]
 
 player_1_cards = cardlib.Hand()
@@ -315,7 +315,7 @@ player_2_cards.add_card(num_card(9, suit.spades))
 player_2_cards.add_card(num_card(9, suit.hearts))
 
 
-p1 = player_1_cards.best_poker_hand(community_cards)
+#p1 = player_1_cards.best_poker_hand(community_cards)
 #p2 = player_2_cards.best_poker_hand(community_cards)
 
 #print("p1:", p1)
@@ -324,8 +324,26 @@ p1 = player_1_cards.best_poker_hand(community_cards)
 #print("p2:", p2)
 #print(p1 > p2)
 
+from cardlib import PokerHand
 
 poker_hand = cardlib.PokerHand()
+#p3 = poker_hand(player_1_cards)
+p3 = poker_hand.check_high_card(player_1_cards)
+print("p3", type(p3))
+#print("p3", p3.cards)
+#print("p3", p3.highest_value)
+#print("p3", p3.type)
+
+p4 = poker_hand.check_one_pair(player_2_cards)
+print("\np4", type(p4))
+#print("p4", p4.cards)
+#print("p4", p4.highest_value)
+#print("p4", p4.type)
+
+print("\nComparison:", "\np3: ", p3, "\np4: ", p4, "\n", p3 == p4)
+
+
+'''
 p3 = poker_hand.check_high_card(player_1_cards)
 print("player 3:", p3)
 print(type(p3), "\n")
@@ -334,8 +352,9 @@ p4 = poker_hand.check_one_pair(player_2_cards)
 print("player 4:", p4)
 print(type(p4), "\n")
 
-print("Comparison:", p3 < p4)
 
+#print("Comparison:", p3 < p4)
+'''
 
 """ Vet inte om det var detta man skulle kunna få ut, eftersom det inte get något utan att köra de olika funktionerna"""
 '''

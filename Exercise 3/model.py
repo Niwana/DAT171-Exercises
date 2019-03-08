@@ -4,7 +4,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import sys
 
-
 # TODO: konstruera en välkomstruta där man anger spelarnas namn, startpengar och (big blind?) blinds värde?
 #  När rutan stängs (ok-knapp?) startar spelet.
 
@@ -40,27 +39,38 @@ import sys
 
 # TODO: Man kan ej folda när alla community cards är lagda. Då återstår check, bet och all in.
 
-deck = StandardDeck()
-deck.create_deck()
-deck.shuffle()
+# deck = StandardDeck()
+# deck.create_deck()
+# deck.shuffle()
+
+
+class DeckModel:
+    def __init__(self):
+        super().__init__()
+        self.deck = StandardDeck()
+        self.deck.create_deck()
+        self.deck.shuffle()
+
 
 class TexasHoldEm(QObject):
     new_credits = pyqtSignal()
     new_pot = pyqtSignal()
 
-    def __init__(self, players, starting_credits):
+    def __init__(self, players, deck_model, starting_credits):
         super().__init__()
         self.players = players
         self.active_player = 0
         self.pot = 0
         self.blind = starting_credits // 100
         self.previous_bet = 0
+        #self.deck = StandardDeck()
+        #self.deck.create_deck()
+        #self.deck.shuffle()
 
         print("Blind:", self.blind)
 
         # Create the community cards view
-        self.community_cards = CommunityCards()
-
+        self.community_cards = CommunityCards(deck_model)
 
     def call(self):
         """ Måste satsa lika mycket som den spelare som satsat mest."""
@@ -76,10 +86,10 @@ class TexasHoldEm(QObject):
         #   "In the third and fourth betting rounds, the stakes double." (???????)
         pass
 
-    def turn(self): # Add the 4th card
+    def turn(self):  # Add the 4th card
         pass
 
-    def river(self): # Add the 5th card
+    def river(self):  # Add the 5th card
         pass
 
     def bet(self, amount):
@@ -99,7 +109,7 @@ class TexasHoldEm(QObject):
         elif amount + self.blind < self.previous_bet:
             print("Bet must be equal to or higher than the previous raise.\n"
             "You tried raising {} + {} (blind) for a total bet of {}.".format(amount, self.blind, amount+self.blind)) # TODO: Printar 1000 när man raisar med 500
-        
+
         elif amount + self.blind <= self.players[self.player.active].credits:
             self.pot += amount + self.blind
             self.players[self.active_player].credits -= amount
@@ -115,7 +125,7 @@ class TexasHoldEm(QObject):
     def fold(self):
         """ Då vinner automatiskt motståndaren? """
         # TODO: Avsluta spelet på något vis? Starta om?
-        self.credits[1 - self.active_player] += self.pot    # Ge motståndaren hela potten.
+        self.credits[1 - self.active_player] += self.pot  # Ge motståndaren hela potten.
         self.pot = 0
 
     def showdown(self):
@@ -138,13 +148,18 @@ class TexasHoldEm(QObject):
             if p0[0] > p1[0]:
                 print("Player 0 won! Identiska händer men högre kort")
                 self.players[0].credits += self.pot
+                self.new_pot.emit()
             if p0[0] < p1[0]:
                 print("Player 1 won! Identiska händer men högre kort")
                 self.players[1].credits += self.pot
+                self.new_pot.emit()
+
             if p0[0].get_value() == p1[0].get_value():
                 print("Oavgjort")
                 self.credits[0] += (self.pot / 2)
                 self.credits[1] += (self.pot / 2)
+                self.new_pot.emit()
+
         else:
             print("Fel vid jämförelsen?")
 
@@ -167,8 +182,8 @@ def convert_card_names(hand):
 
 
 class Player:
-    def __init__(self, player_name, starting_credits=50000):
-        self.cards = deck.draw_card(2)
+    def __init__(self, player_name, card_model, starting_credits=50000):
+        self.cards = card_model.deck.draw_card(2) # TODO: Fixa
         self.hand = Hand()
         for card in self.cards:
             self.hand.add_card(card)
@@ -180,9 +195,9 @@ class Player:
 
 
 class CommunityCards:
-    def __init__(self):
+    def __init__(self, card_model):
         super().__init__()
-        self.cards = deck.draw_card(5)
+        self.cards = card_model.deck.draw_card(5)
         self.cards_to_view = convert_card_names(self.cards)
 
 
@@ -204,11 +219,10 @@ class Buttons:
         """ "Att checka (eller passa) betyder att man väljer att inte satsa något nu, men ändå vill
         stanna kvar i given tillsvidare. Man kan checka så länge ingen annan öppnat."""
         self.active_player = 1 - self.active_player
-    
-    
+
+
     def all_in(self):
         """ När någon gör all in måste den andra spelaren folda eller också göra all in """
         self.pot += self.credit(self.active_player)
         self.credit[self.active_player] = 0
 '''
-
