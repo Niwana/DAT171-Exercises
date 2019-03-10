@@ -284,7 +284,7 @@ class GameView(QGroupBox):
         box.addButton(play_again_button, box.YesRole)
         box.addButton(exit_button, box.NoRole)
 
-        play_again_button.clicked.connect(self.model.restart)
+        play_again_button.clicked.connect(self.model.next_round)
         exit_button.clicked.connect(self.exit_application)
 
         box.exec_()
