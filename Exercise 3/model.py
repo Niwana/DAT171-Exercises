@@ -215,6 +215,8 @@ class TexasHoldEm(QObject):
         self.players[self.active_player].active = True  # Let the first player begin
         self.players[self.active_player-1].flip_cards()
 
+        self.community_cards.flip_cards()
+
         # Create a new deck
         self.deck_model = DeckModel()
 
@@ -294,6 +296,10 @@ class CommunityCards(QObject):
     def new_cards(self, deck_model):
         self.cards = deck_model.deck.draw_card(5)
         self.cards_to_view = convert_card_names(self.cards)
+        self.update_cards_data.emit()
+
+    def flip_cards(self):
+        self.flipped_cards = [not i for i in self.flipped_cards]
         self.update_cards_data.emit()
 
     def flop(self):
