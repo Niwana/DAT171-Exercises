@@ -42,23 +42,28 @@ class CardView(QGraphicsView):
     back_card = QSvgRenderer('cards/Red_Back_2.svg')
     all_cards = read_cards()
 
-    def __init__(self, cards, card_spacing=250, padding=0):
+    def __init__(self, card_models, card_spacing=250, padding=0):
         self.scene = QGraphicsScene()
         super().__init__(self.scene)
 
         self.card_spacing = card_spacing
         self.padding = padding
 
-        self.cards = cards
-        self.change_cards()
+        self.cards = card_models
 
-        # self.cards.new_player_cards.connect(self.change_cards)
-        # self.cards.new_community_cards.connect(self.change_cards)
+        # Update cards when a players data has changed
+        card_models.update_cards_data.connect(self.change_cards)
+
+        self.change_cards()
 
     def change_cards(self):
         self.scene.clear()
         for index, card_ref in enumerate(self.cards.cards_to_view):
-            renderer = self.all_cards[card_ref]
+            if self.cards.flipped_cards[index]:
+                renderer = self.back_card
+            else:
+                renderer = self.all_cards[card_ref]
+
             card = CardItem(renderer, index)
 
             shadow = QGraphicsDropShadowEffect(card)
@@ -160,6 +165,7 @@ class InputBoxLayout(QGroupBox):
         vbox_buttons.addWidget(self.fold_button)
 
         self.setLayout(vbox_buttons)
+        self.setFixedWidth(156)
 
         # Logic
         self.model = texas_model
@@ -172,6 +178,23 @@ class InputBoxLayout(QGroupBox):
                 self.model.bet(int(bet_amount))
 
         self.raise_button.clicked.connect(bet)
+
+
+class OutputBox(QGroupBox):
+    def __init__(self, texas_model):
+        super().__init__()
+        self.field = QPlainTextEdit(self)
+        # self.field.setFixedWidth(156)
+        self.text = "Starting game..."
+        self.field.insertPlainText(self.text)
+        self.field.setReadOnly(True)
+        self.field.setFixedWidth(156)
+        self.setFixedWidth(156)
+
+        texas_model.new_output.connect(self.add_text)
+
+    def add_text(self, text: str):
+        self.field.appendPlainText("------\n{}".format(text))
 
 
 class PlayerView(QGroupBox):
@@ -231,15 +254,19 @@ class GameView(QGroupBox):
         self.model = texas_model
 
         vbox = QVBoxLayout()
-        hbox = QHBoxLayout()
+        hbox_lower = QHBoxLayout()
+        hbox_upper = QHBoxLayout()
 
-        hbox.addWidget(InputBoxLayout(texas_model), 1)
+        hbox_lower.addWidget(InputBoxLayout(texas_model))
 
         for cv_index, player in enumerate(players):
-            hbox.addWidget(PlayerView(texas_model, player), 10)
+            hbox_lower.addWidget(PlayerView(texas_model, player))
 
-        vbox.addWidget(CommunityCards(texas_model))
-        vbox.addLayout(hbox)
+        hbox_upper.addWidget(OutputBox(texas_model))
+        hbox_upper.addWidget(CommunityCards(texas_model))
+
+        vbox.addLayout((hbox_upper))
+        vbox.addLayout(hbox_lower)
 
         # self.setGeometry(300, 300, 1000, 600)
         self.setWindowTitle("Texas Hold'em")
@@ -250,7 +277,27 @@ class GameView(QGroupBox):
     def alert_user(self, text):
         box = QMessageBox()
         box.setText(text)
+
+        play_again_button = QPushButton("Play again")
+        exit_button = QPushButton("Quit game")
+
+        box.addButton(play_again_button, box.YesRole)
+        box.addButton(exit_button, box.NoRole)
+
+        play_again_button.clicked.connect(self.model.restart)
+        exit_button.clicked.connect(self.exit_application)
+
         box.exec_()
+
+    @staticmethod
+    def exit_application():
+        sys.exit(qt_app.exec_())
+
+
+
+
+
+
 
 
 

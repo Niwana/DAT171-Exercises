@@ -250,6 +250,28 @@ class Rank(enum.IntEnum):
     four_of_a_kind = 7
     straight_flush = 8
 
+    def __str__(self):
+        """ Returns the name and symbol of the suit. """
+        if self.value == 0:
+            return 'high card'
+        if self.value == 1:
+            return 'one pair'
+        if self.value == 2:
+            return 'two pairs'
+        if self.value == 3:
+            return 'three of a kind'
+        if self.value == 4:
+            return 'straight'
+        if self.value == 5:
+            return 'flush'
+        if self.value == 6:
+            return 'full house'
+        if self.value == 7:
+            return 'four of a kind'
+        if self.value == 8:
+            return 'straight flush'
+
+
 
 class PokerHand:
     """ A class that represent the poker hand with functions for identifying the best poker hand. """

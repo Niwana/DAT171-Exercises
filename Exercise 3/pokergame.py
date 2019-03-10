@@ -2,9 +2,9 @@ import model
 from main_view import *
 
 # TODO: Ska detta köras mer än 1 gång?
+deck_model = model.DeckModel()
 
 # Create the players
-deck_model = model.DeckModel()
 players = [model.Player('B1', deck_model), model.Player('B2', deck_model)]
 
 # Create the game model
