@@ -1,14 +1,21 @@
-import model
-from main_view import *
+from model import TexasHoldEm, DeckModel, Player
+from main_view import GameView, qt_app
 
-# TODO: Ska detta köras mer än 1 gång?
-deck_model = model.DeckModel()
+
+# Starting credits and player names.
+starting_credits = 50000
+player_0_name = 'B1'
+player_1_name = 'B2'
+
+# Create the card deck
+deck_model = DeckModel()
 
 # Create the players
-players = [model.Player('B1', deck_model), model.Player('B2', deck_model)]
+players = [Player(player_0_name, deck_model, starting_credits),
+           Player(player_1_name, deck_model, starting_credits)]
 
 # Create the game model
-texas_model = model.TexasHoldEm(players, deck_model, starting_credits=50000)
+texas_model = TexasHoldEm(players, deck_model, starting_credits)
 view = GameView(texas_model, players)
 view.show()
 qt_app.exec_()

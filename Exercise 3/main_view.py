@@ -1,15 +1,10 @@
 import sys
-import model
-from PyQt5.QtSvg import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt5.QtSvg import QGraphicsSvgItem, QSvgRenderer
+from PyQt5.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QGraphicsDropShadowEffect, QGroupBox, QLabel,\
+    QHBoxLayout, QVBoxLayout, QPushButton, QLineEdit, QPlainTextEdit, QMessageBox
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor, QFont
 
-
-# Låt vinsten vara en funktion med potten som input. Kom ihåg att lägga till signals.
-# g.player[0].win_money(pot)
-# Använd ej följande:
-# g.player[0].money += pot
 
 qt_app = QApplication(sys.argv)
 
@@ -26,8 +21,7 @@ class CardItem(QGraphicsSvgItem):
 class CardView(QGraphicsView):
 
     def read_cards():
-        """
-        :return:
+        """ A function for importing the .svg image files depicting the playing cards.
         """
         all_cards = dict()
         for suit in 'HDSC':
@@ -35,8 +29,6 @@ class CardView(QGraphicsView):
                 file = value + suit
                 all_cards[file] = QSvgRenderer('cards/' + file + '.svg')
 
-        # print(type(all_cards))
-        # print(all_cards)
         return all_cards
 
     back_card = QSvgRenderer('cards/Red_Back_2.svg')
@@ -57,6 +49,7 @@ class CardView(QGraphicsView):
         self.change_cards()
 
     def change_cards(self):
+        """ A function for changing the displayed cards. """
         self.scene.clear()
         for index, card_ref in enumerate(self.cards.cards_to_view):
             if self.cards.flipped_cards[index]:
@@ -77,23 +70,23 @@ class CardView(QGraphicsView):
         self.update_view()
 
     def update_view(self):
+        """ A function for updating the view and resizing the cards accordingly. """
         for card in self.scene.items():
             orig_card_height = card.boundingRect().bottom()
             orig_card_width = card.boundingRect().width()
 
             scale = (self.viewport().height() - 2 * self.padding) / orig_card_height
-            scale_width = (self.viewport().width() - (len(self.scene.items()) + 1) * self.padding) / (orig_card_width * len(self.scene.items()))
-
-            # scale_width = ((self.viewport().width() - 2 * len(self.scene.items()) * self.padding) / (orig_card_width * len(self.scene.items())))
+            scale_width = (self.viewport().width() - (len(self.scene.items()) + 1) * self.padding) / \
+                          (orig_card_width * len(self.scene.items()))
 
             req_width = self.card_spacing * scale * len(self.scene.items())
 
-            # TODO: identifera vad som är fel. Stämmer villkoren och skalningen? Korten hoppar i storlek vid övergången
             if req_width > self.viewport().width():
                 scale = scale_width * 0.9
 
             margin_height = (self.viewport().height() - (orig_card_height * scale)) / 2
-            margin_width = (self.viewport().width() - (len(self.scene.items()) -1) * self.card_spacing * scale - (orig_card_width * scale))/2
+            margin_width = (self.viewport().width() - (len(self.scene.items()) - 1) *
+                            self.card_spacing * scale - (orig_card_width * scale))/2
 
             card.setPos(margin_width + card.position * self.card_spacing * scale, margin_height)
             card.setScale(scale)
@@ -106,7 +99,7 @@ class CardView(QGraphicsView):
 
 
 class CommunityCards(QGroupBox):
-    """ Community cards """
+    """ A class representing the view of the community cards. """
 
     def __init__(self, texas_model):
         super().__init__("Community cards")
@@ -144,7 +137,7 @@ class CommunityCards(QGroupBox):
 
 
 class InputBoxLayout(QGroupBox):
-    """ Input box with buttons for call, fold and raise. """
+    """ A class representing an input box with buttons for call, fold and raise. """
 
     def __init__(self, texas_model):
         super().__init__("Input box")
@@ -165,7 +158,7 @@ class InputBoxLayout(QGroupBox):
         vbox_buttons.addWidget(self.fold_button)
 
         self.setLayout(vbox_buttons)
-        self.setFixedWidth(156)
+        self.setFixedWidth(180)
 
         # Logic
         self.model = texas_model
@@ -176,20 +169,25 @@ class InputBoxLayout(QGroupBox):
             bet_amount = self.raise_button_field.text()
             if bet_amount.isdigit():
                 self.model.bet(int(bet_amount))
+                self.raise_button_field.clear()
 
         self.raise_button.clicked.connect(bet)
 
 
 class OutputBox(QGroupBox):
+    """ A class representing an output screen in which the game model can print the player moves. """
     def __init__(self, texas_model):
         super().__init__()
         self.field = QPlainTextEdit(self)
-        # self.field.setFixedWidth(156)
-        self.text = "Starting game..."
-        self.field.insertPlainText(self.text)
+
+        output_text = "Starting game...\n{} post the big blind [${}]\n{} post the small blind [${}]".format(
+            texas_model.players[(texas_model.active_player + 1) % len(texas_model.players)].name, texas_model.big_blind,
+            texas_model.players[texas_model.active_player].name, texas_model.small_blind)
+
+        self.field.insertPlainText(output_text)
         self.field.setReadOnly(True)
-        self.field.setFixedWidth(156)
-        self.setFixedWidth(156)
+        self.field.setFixedWidth(180)
+        self.setFixedWidth(180)
 
         texas_model.new_output.connect(self.add_text)
 
@@ -198,7 +196,7 @@ class OutputBox(QGroupBox):
 
 
 class PlayerView(QGroupBox):
-    """ Active player """
+    """ A class representing the player view. """
 
     def __init__(self, texas_model, player):
         super().__init__("Player view")
@@ -247,7 +245,8 @@ class PlayerView(QGroupBox):
 
 
 class GameView(QGroupBox):
-    """ main window """
+    """ A class representing the main window. It contains functions for displaying pop-up
+        messages alerting the user. """
 
     def __init__(self, texas_model, players):
         super().__init__("main window")
@@ -265,18 +264,19 @@ class GameView(QGroupBox):
         hbox_upper.addWidget(OutputBox(texas_model))
         hbox_upper.addWidget(CommunityCards(texas_model))
 
-        vbox.addLayout((hbox_upper))
+        vbox.addLayout(hbox_upper)
         vbox.addLayout(hbox_lower)
 
-        # self.setGeometry(300, 300, 1000, 600)
         self.setWindowTitle("Texas Hold'em")
         self.setLayout(vbox)
 
         texas_model.game_message.connect(self.alert_user)
+        texas_model.game_message_warning.connect(self.alert_user_warning)
 
     def alert_user(self, text):
         box = QMessageBox()
         box.setText(text)
+        box.setWindowTitle("Texas Hold'em")
 
         play_again_button = QPushButton("Play again")
         exit_button = QPushButton("Quit game")
@@ -289,16 +289,12 @@ class GameView(QGroupBox):
 
         box.exec_()
 
+    def alert_user_warning(self, text):
+        box = QMessageBox()
+        box.setText(text)
+        box.setWindowTitle("Texas Hold'em")
+        box.exec_()
+
     @staticmethod
     def exit_application():
         sys.exit(qt_app.exec_())
-
-
-
-
-
-
-
-
-
-
