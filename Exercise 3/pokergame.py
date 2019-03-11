@@ -3,7 +3,7 @@ from main_view import GameView, qt_app
 
 
 # Starting credits and player names.
-starting_credits = 50000
+starting_credits = 5000
 player_0_name = 'B1'
 player_1_name = 'B2'
 

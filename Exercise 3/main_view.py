@@ -183,7 +183,6 @@ class OutputBox(QGroupBox):
         output_text = "Starting game...\n{} post the big blind [${}]\n{} post the small blind [${}]".format(
             texas_model.players[(texas_model.active_player + 1) % len(texas_model.players)].name, texas_model.big_blind,
             texas_model.players[texas_model.active_player].name, texas_model.small_blind)
-
         self.field.insertPlainText(output_text)
         self.field.setReadOnly(True)
         self.field.setFixedWidth(180)

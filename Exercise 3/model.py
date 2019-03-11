@@ -48,8 +48,6 @@ class TexasHoldEm(QObject):
 
         # Flip the starting player's cards in order to reveal them
         self.players[self.active_player].flip_cards()
-        text = "test2"
-        self.new_output.emit(text)
 
     def initiate_blind(self, blinds):
         """ A function for initiating the small and big blind, with the big blind being
@@ -106,7 +104,7 @@ class TexasHoldEm(QObject):
             self.restart()
         if self.players[(self.active_player + 1) % len(self.players)].credits < self.big_blind:
             message = "Player {} won! Not enough money remaining.".format(self.players[self.active_player].name)
-            self.game_message.emit(message)
+            self.game_message_warning.emit(message)
             self.restart()
 
         if amount == 0:
@@ -362,6 +360,11 @@ class Player(QObject):
 
     def new_cards(self, deck_model):
         self.cards = deck_model.deck.draw_card(2)
+
+        self.hand.remove_card([0, 1])
+        for card in self.cards:
+            self.hand.add_card(card)
+
         self.cards_to_view = convert_card_names(self.cards)
         self.update_cards_data.emit()
 
